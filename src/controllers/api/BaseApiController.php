@@ -926,7 +926,7 @@ EOL;
                 try {
                     $iconContent = $icon->getContents();
                 } catch (\Throwable $e) {
-                    Craft::warning("Could not fetch the plugin icon for $plugin->handle: {$e->getMessage()}");
+                    Craft::warning("Could not fetch the plugin icon for $plugin->handle: {$e->getMessage()}", __METHOD__);
                     Craft::$app->getErrorHandler()->logException($e);
                     $iconContent = null;
                 }
