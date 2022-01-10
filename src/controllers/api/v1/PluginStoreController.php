@@ -49,7 +49,7 @@ class PluginStoreController extends BaseApiController
      */
     public function actionIndex(): Response
     {
-        $cacheKey = __METHOD__ . '-' . $this->cmsVersionForPluginQueries();
+        $cacheKey = $this->_cacheKey(__METHOD__);
         $pluginStoreData = Cache::get($cacheKey);
 
         if (!$pluginStoreData) {
@@ -71,7 +71,6 @@ class PluginStoreController extends BaseApiController
             }
 
             $plugins = $this->_createPluginQuery()
-                ->withLatestReleaseInfo(true, $this->cmsVersionForPluginQueries())
                 ->indexBy('id')
                 ->all();
 
@@ -116,7 +115,7 @@ class PluginStoreController extends BaseApiController
      */
     public function actionFeaturedSection($handle): Response
     {
-        $cacheKey = __METHOD__ . $handle;
+        $cacheKey = $this->_cacheKey(__METHOD__, $handle);
         $data = Cache::get($cacheKey);
 
         if (!$data) {
@@ -138,7 +137,7 @@ class PluginStoreController extends BaseApiController
      */
     public function actionFeaturedSections(): Response
     {
-        $cacheKey = __METHOD__;
+        $cacheKey = $this->_cacheKey(__METHOD__);
         $data = Cache::get($cacheKey);
 
         if (!$data) {
@@ -175,7 +174,7 @@ class PluginStoreController extends BaseApiController
      */
     public function actionPlugin(string $handle): Response
     {
-        $cacheKey = __METHOD__ . '-' . $handle;
+        $cacheKey = $this->_cacheKey(__METHOD__, $handle);
         $data = Cache::get($cacheKey);
 
         if (!$data) {
@@ -265,7 +264,7 @@ class PluginStoreController extends BaseApiController
         $page = max($page, 1);
         $direction = $direction === 'asc' ? SORT_ASC : SORT_DESC;
 
-        $cacheKey = __METHOD__ . "-{$handle}-{$categoryId}-{$developerId}-{$searchQuery}-{$perPage}-{$page}-{$orderBy}-{$direction}";
+        $cacheKey = $this->_cacheKey(__METHOD__, $handle, $categoryId, $developerId, $searchQuery, $perPage, $page, $orderBy, $direction);
         $data = Cache::get($cacheKey);
 
         if (!$data) {
@@ -353,7 +352,7 @@ class PluginStoreController extends BaseApiController
      */
     public function actionPluginsByFeaturedSection(string $handle): Response
     {
-        $cacheKey = __METHOD__ . '-' . $handle;
+        $cacheKey = $this->_cacheKey(__METHOD__, $handle);
         $data = Cache::get($cacheKey);
 
         if (!$data) {
@@ -397,7 +396,7 @@ class PluginStoreController extends BaseApiController
     {
         $pluginHandles = $this->request->getParam('pluginHandles', '');
 
-        $cacheKey = __METHOD__ . $pluginHandles;
+        $cacheKey = $this->_cacheKey(__METHOD__, $pluginHandles);
         $data = Cache::get($cacheKey);
 
         if (!$data) {
@@ -443,7 +442,7 @@ class PluginStoreController extends BaseApiController
      */
     private function _categories(): array
     {
-        $cacheKey = __METHOD__;
+        $cacheKey = $this->_cacheKey(__METHOD__);
         $data = Cache::get($cacheKey);
 
         if (!$data) {
@@ -501,7 +500,7 @@ class PluginStoreController extends BaseApiController
      */
     private function _preparePluginQuery(PluginQuery $query, bool $withEagerLoading = true)
     {
-        $query->withLatestReleaseInfo();
+        $query->withLatestReleaseInfo(true, $this->cmsVersionForPluginQueries());
         if ($withEagerLoading) {
             $query->with(['developer', 'categories', 'icon', 'editions']);
         }
@@ -561,5 +560,17 @@ class PluginStoreController extends BaseApiController
         }
 
         return $dates;
+    }
+
+    /**
+     * @param string|null ...$components
+     * @return string
+     */
+    private function _cacheKey(?string ...$components): string
+    {
+        if ($cmsVersion = $this->cmsVersionForPluginQueries()) {
+            $components[] = $cmsVersion;
+        }
+        return implode('-', $components);
     }
 }
