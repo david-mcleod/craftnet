@@ -243,11 +243,12 @@ class PluginQuery extends ElementQuery
 
             if ($this->cmsVersion) {
                 $cmsRelease = $packageManager->getRelease('craftcms/cms', $this->cmsVersion);
-                if ($cmsRelease) {
-                    $latestReleaseQuery
-                        ->innerJoin(['s_vc' => Table::PLUGINVERSIONCOMPAT], '[[s_vc.pluginVersionId]] = [[s_v.id]]')
-                        ->andWhere(['s_vc.cmsVersionId' => $cmsRelease->id]);
+                if (!$cmsRelease) {
+                    return false;
                 }
+                $latestReleaseQuery
+                    ->innerJoin(['s_vc' => Table::PLUGINVERSIONCOMPAT], '[[s_vc.pluginVersionId]] = [[s_v.id]]')
+                    ->andWhere(['s_vc.cmsVersionId' => $cmsRelease->id]);
             }
 
             if ($this->minStability) {
