@@ -139,6 +139,12 @@ abstract class BaseApiController extends Controller
     private $_logRequestKeys = [];
 
     /**
+     * @var string|false
+     * @see cmsVersionForPluginQueries()
+     */
+    private string|false $_cmsVersionForPluginQueries;
+
+    /**
      * @return array
      */
     public function getLogRequestKeys(): array
@@ -1111,5 +1117,25 @@ EOL;
         $manager->addHistory($license->id, "created by $this->email");
 
         return $license;
+    }
+
+    /**
+     * Returns the Craft version that should be passed to plugin queries’ `withLatestReleaseInfo` params.
+     *
+     * @return string|null
+     */
+    protected function cmsVersionForPluginQueries(): ?string
+    {
+        if (!isset($this->_cmsVersionForPluginQueries)) {
+            if ($cmsConstraint = $this->request->getQueryParam('cmsConstraint')) {
+                $cmsVersion = $this->module->getPackageManager()
+                    ->getLatestVersion('craftcms/cms', null, $cmsConstraint) ?? '0.0';
+            } else {
+                $cmsVersion = $this->cmsVersion;
+            }
+            $this->_cmsVersionForPluginQueries = $cmsVersion ?? false;
+        }
+
+        return $this->_cmsVersionForPluginQueries ?: null;
     }
 }

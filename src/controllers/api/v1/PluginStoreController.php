@@ -49,7 +49,7 @@ class PluginStoreController extends BaseApiController
      */
     public function actionIndex(): Response
     {
-        $cacheKey = __METHOD__ . '-' . $this->cmsVersion;
+        $cacheKey = __METHOD__ . '-' . $this->cmsVersionForPluginQueries();
         $pluginStoreData = Cache::get($cacheKey);
 
         if (!$pluginStoreData) {
@@ -58,7 +58,7 @@ class PluginStoreController extends BaseApiController
             foreach ($this->_createFeaturedSectionQuery()->all() as $entry) {
                 try {
                     $pluginIds = $this->_createFeaturedPluginQuery($entry)
-                        ->withLatestReleaseInfo(true, $this->cmsVersion)
+                        ->withLatestReleaseInfo(true, $this->cmsVersionForPluginQueries())
                         ->ids();
                 } catch (InvalidArgumentException $e) {
                     continue;
@@ -71,7 +71,7 @@ class PluginStoreController extends BaseApiController
             }
 
             $plugins = $this->_createPluginQuery()
-                ->withLatestReleaseInfo(true, $this->cmsVersion)
+                ->withLatestReleaseInfo(true, $this->cmsVersionForPluginQueries())
                 ->indexBy('id')
                 ->all();
 

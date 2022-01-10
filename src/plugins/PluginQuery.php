@@ -184,6 +184,10 @@ class PluginQuery extends ElementQuery
 
     protected function beforePrepare(): bool
     {
+        if ($this->cmsVersion === '0.0') {
+            return false;
+        }
+
         $this->joinElementTable('craftnet_plugins');
 
         $this->query->select([
