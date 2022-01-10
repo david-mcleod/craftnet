@@ -57,6 +57,12 @@ class PackageManager extends Component
     ];
 
     /**
+     * @var array
+     * @see getRelease()
+     */
+    private array $_releases = [];
+
+    /**
      * @inheritdoc
      */
     public function init()
@@ -127,13 +133,12 @@ class PackageManager extends Component
      */
     public function getRelease(string $name, string $version): ?PackageRelease
     {
-        $result = $this->createReleaseQuery($name, $version)->one();
-
-        if (!$result) {
-            return null;
+        $version = (new VersionParser())->normalize($version);
+        if (!isset($this->_releases[$name]) || !array_key_exists($version, $this->_releases[$name])) {
+            $result = $this->createReleaseQuery($name, $version)->one();
+            $this->_releases[$name][$version] = $result ? new PackageRelease($result) : null;
         }
-
-        return new PackageRelease($result);
+        return $this->_releases[$name][$version];
     }
 
     /**
@@ -1062,6 +1067,9 @@ class PackageManager extends Component
         ) {
             $plugin->publish();
         }
+
+        // Clear caches
+        unset($this->_releases[$name]);
 
         return $totalAffected;
     }
