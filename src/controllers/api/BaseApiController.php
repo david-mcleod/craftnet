@@ -217,7 +217,7 @@ abstract class BaseApiController extends Controller
         }
 
         // was system info provided?
-        if ($checkCraftHeaders && $requestHeaders->has('X-Craft-System')) {
+        if ($requestHeaders->has('X-Craft-System')) {
             foreach (explode(',', $requestHeaders->get('X-Craft-System')) as $info) {
                 [$name, $installed] = array_pad(explode(':', $info, 2), 2, null);
                 if ($installed !== null) {
@@ -230,7 +230,10 @@ abstract class BaseApiController extends Controller
                 if ($name === 'craft') {
                     $this->cmsVersion = $version;
                     $this->cmsEdition = $edition;
-                } else if (strncmp($name, 'plugin-', 7) === 0) {
+                    if (!$checkCraftHeaders) {
+                        break;
+                    }
+                } else if ($checkCraftHeaders && strncmp($name, 'plugin-', 7) === 0) {
                     $pluginHandle = substr($name, 7);
                     $this->pluginVersions[$pluginHandle] = $version;
                     $this->pluginEditions[$pluginHandle] = $edition;
