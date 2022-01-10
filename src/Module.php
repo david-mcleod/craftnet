@@ -20,6 +20,7 @@ use craft\events\DefineBehaviorsEvent;
 use craft\events\DefineConsoleActionsEvent;
 use craft\events\DefineFieldLayoutFieldsEvent;
 use craft\events\DeleteElementEvent;
+use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterCpNavItemsEvent;
 use craft\events\RegisterEmailMessagesEvent;
@@ -37,6 +38,7 @@ use craft\services\SystemMessages;
 use craft\services\UserPermissions;
 use craft\services\Users;
 use craft\services\Utilities;
+use craft\utilities\ClearCaches;
 use craft\volumes\Local as LocalVolume;
 use craft\web\Request;
 use craft\web\twig\variables\Cp;
@@ -378,6 +380,13 @@ class Module extends \yii\base\Module
                     ];
                     break;
             }
+        });
+
+        Event::on(ClearCaches::class, ClearCaches::EVENT_REGISTER_TAG_OPTIONS, function(RegisterCacheOptionsEvent $event) {
+            $event->options[] = [
+                'tag' => 'pluginIcon',
+                'label' => Craft::t('app', 'Plugin icons'),
+            ];
         });
     }
 

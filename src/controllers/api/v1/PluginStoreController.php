@@ -571,6 +571,11 @@ class PluginStoreController extends BaseApiController
         if ($cmsVersion = $this->cmsVersionForPluginQueries()) {
             $components[] = $cmsVersion;
         }
+
+        if ($this->withPluginIcons()) {
+            $components[] = 'withIcons';
+        }
+
         return implode('-', $components);
     }
 }

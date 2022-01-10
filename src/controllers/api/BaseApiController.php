@@ -10,8 +10,10 @@ use craft\errors\InvalidPluginException;
 use craft\helpers\App;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Db;
+use craft\helpers\Html;
 use craft\helpers\HtmlPurifier;
 use craft\helpers\Json;
+use craft\helpers\StringHelper;
 use craft\web\Controller;
 use craftnet\behaviors\UserBehavior;
 use craftnet\cms\CmsLicense;
@@ -20,6 +22,7 @@ use craftnet\db\Table;
 use craftnet\errors\ExpiredTokenException;
 use craftnet\errors\LicenseNotFoundException;
 use craftnet\errors\ValidationException;
+use craftnet\helpers\Cache;
 use craftnet\helpers\KeyHelper;
 use craftnet\Module;
 use craftnet\oauthserver\Module as OauthServer;
@@ -814,6 +817,16 @@ EOL;
     }
 
     /**
+     * Returns whether plugin icon SVG contents should be included in plugin details.
+     *
+     * @return bool
+     */
+    protected function withPluginIcons(): bool
+    {
+        return (bool)$this->request->getQueryParam('withPluginIcons');
+    }
+
+    /**
      * @param Plugin $plugin
      * @param bool $fullDetails
      *
@@ -902,6 +915,39 @@ EOL;
             if (!$data['phpVersionCompatible'] = $this->_checkPhpRequirement($plugin->latestVersionId, $phpConstraint, $incompatiblePhpVersion)) {
                 $data['phpConstraint'] = $phpConstraint;
                 $data['incompatiblePhpVersion'] = $incompatiblePhpVersion;
+            }
+        }
+
+        if ($this->withPluginIcons()) {
+            $cacheKey = "pluginIcon:$plugin->id";
+            $iconContent = Cache::get($cacheKey);
+
+            if (!$iconContent) {
+                try {
+                    $iconContent = $icon->getContents();
+                } catch (\Throwable $e) {
+                    Craft::warning("Could not fetch the plugin icon for $plugin->handle: {$e->getMessage()}");
+                    Craft::$app->getErrorHandler()->logException($e);
+                    $iconContent = null;
+                }
+
+                if ($iconContent) {
+                    // Sanitize
+                    $iconContent = Html::sanitizeSvg($iconContent);
+                    // Remove the XML declaration
+                    $iconContent = preg_replace('/<\?xml.*?\?>\s*/', '', $iconContent);
+                    // Namespace class names and IDs
+                    $iconContent = Html::namespaceAttributes($iconContent, StringHelper::randomString(10), true);
+
+                    Cache::set($cacheKey, $iconContent, [
+                        'pluginIcon',
+                        sprintf('element::%s::%s', Plugin::class, $plugin->id),
+                    ]);
+                }
+            }
+
+            if ($iconContent) {
+                $data['icon'] = $iconContent;
             }
         }
 
