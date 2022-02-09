@@ -60,6 +60,7 @@ return [
     'hpc3.hpconnected.com',
     'hpsmartdev.com',
     'hyperlane.co',
+    'imarc.io',
     'infomedia-dev.com',
     'inspireserverc.com',
     'isted.dev',
