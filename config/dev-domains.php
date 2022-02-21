@@ -125,6 +125,7 @@ return [
     'stagingbox.ca',
     'stagingbox.co.uk',
     'steadfa.st',
+    'stockwerk-dev.de',
     'stormdev.co.uk',
     'sunscreem.xyz',
     'tad.am',
