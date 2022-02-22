@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@pixelandtonic/craftui": "~0.3.8",
-    "axios": "^0.18.0",
+    "axios": "^0.21.2",
     "debounce": "^1.2.0",
     "humanize-duration": "^3.15.0",
     "limax": "^1.7.0",
