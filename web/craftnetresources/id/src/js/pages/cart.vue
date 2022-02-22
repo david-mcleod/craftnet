@@ -282,25 +282,36 @@
         },
 
         mounted() {
-            this.loading = true
+          // Replace the existing order number with the one provided in the query params (if any)
+          if (this.$route.query.orderNumber) {
+            const orderNumber = this.$route.query.orderNumber
+            this.$store.commit('cart/resetCart')
+            this.$store.dispatch('cart/saveOrderNumber', {orderNumber})
+            this.$router.push('/cart')
 
-            this.getCoreData()
-                .then(() => {
-                    this.getCart()
-                        .then(() => {
-                            this.loading = false
+            return null
+          }
 
-                            this.cartItems.forEach(function(item, key) {
-                                this.$set(this.itemQuantity, key, 1)
-                            }.bind(this))
-                        })
-                        .catch(() => {
-                            this.loading = false
-                        })
-                })
-                .catch(() => {
-                    this.loading = false
-                })
+          this.loading = true
+
+          this.getCoreData()
+              .then(() => {
+                  this.getCart()
+                      .then(() => {
+                          this.loading = false
+
+                          this.cartItems.forEach(function(item, key) {
+                              this.$set(this.itemQuantity, key, 1)
+                          }.bind(this))
+
+                      })
+                      .catch(() => {
+                          this.loading = false
+                      })
+              })
+              .catch(() => {
+                  this.loading = false
+              })
         },
     }
 </script>
