@@ -17,7 +17,6 @@ use craft\helpers\App;
 use craft\helpers\Json;
 use craftnet\behaviors\UserBehavior;
 use craftnet\cms\CmsLicense;
-use craftnet\controllers\api\BaseApiController;
 use craftnet\controllers\id\DeveloperSupportController;
 use craftnet\db\Table;
 use craftnet\errors\ValidationException;
@@ -331,7 +330,7 @@ class FrontController extends BaseApiController
         // Validate the request
         $secret = Craft::$app->request->getQueryParam('secret');
         Craft::error('Loc 3');
-        if (!$secret || !hash_equals($secret, App::env('FRONT_AUTH_SECRET'))) {
+        if (!$secret || $secret !== App::env('FRONT_AUTH_SECRET')) {
             Craft::error('Loc 4');
             throw new UnauthorizedHttpException();
         }
