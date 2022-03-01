@@ -328,9 +328,9 @@ class FrontController extends BaseApiController
     {
         Craft::error('Loc 2');
         // Validate the request
-        $secret = Craft::$app->request->getQueryParam('secret');
+        $secret = $this->request->getRequiredQueryParam('secret');
         Craft::error('Loc 3');
-        if (!$secret || $secret !== App::env('FRONT_AUTH_SECRET')) {
+        if ($secret !== App::env('FRONT_AUTH_SECRET')) {
             Craft::error('Loc 4');
             throw new UnauthorizedHttpException();
         }
