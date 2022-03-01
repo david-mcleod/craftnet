@@ -7,7 +7,7 @@
  * @link      https://craftcms.com
  */
 
-namespace craftnet\controllers;
+namespace craftnet\controllers\api;
 
 use Craft;
 use craft\db\Query;
