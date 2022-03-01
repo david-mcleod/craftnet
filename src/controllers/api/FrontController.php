@@ -59,7 +59,9 @@ class FrontController extends BaseApiController
      */
     public function beforeAction($action)
     {
+        Craft::error('Loc 1');
         $this->_validateSecret();
+        Craft::error('Loc 6');
         return parent::beforeAction($action);
     }
 
@@ -272,7 +274,7 @@ class FrontController extends BaseApiController
             $recipient = $conversationData['recipient']['handle'] ?? null;
         }
 
-        $response = $response = $client->request('GET', $apiHost . 'conversations/' . $conversationId . '/messages');
+        $response = $client->request('GET', $apiHost . 'conversations/' . $conversationId . '/messages');
         $messages = Json::decodeIfJson($response->getBody()->getContents());
 
         if (is_array($messages)) {
@@ -309,14 +311,13 @@ class FrontController extends BaseApiController
      */
     public function actionTest()
     {
-        $this->_validateSecret();
-
+        Craft::error('Loc 7');
         Craft::$app->getMailer()->compose()
             ->setSubject('Front Test Webhook')
             ->setTextBody(Json::encode($this->getPayload(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT))
             ->setTo('brad@pixelandtonic.com')
             ->send();
-
+        Craft::error('Loc 8');
         return '';
     }
 
@@ -326,12 +327,16 @@ class FrontController extends BaseApiController
      */
     private function _validateSecret()
     {
+        Craft::error('Loc 2');
         // Validate the request
         $secret = Craft::$app->request->getQueryParam('secret');
+        Craft::error('Loc 3');
         if (!$secret || !hash_equals($secret, App::env('FRONT_AUTH_SECRET'))) {
+            Craft::error('Loc 4');
             throw new UnauthorizedHttpException();
         }
 
+        Craft::error('Loc 5');
         // Only allow to be framed from Front
         Craft::$app->response->headers
             ->set('X-Frame-Options', 'allow-from https://app.frontapp.com/');
