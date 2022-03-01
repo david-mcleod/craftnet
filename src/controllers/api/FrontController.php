@@ -58,9 +58,7 @@ class FrontController extends BaseApiController
      */
     public function beforeAction($action)
     {
-        Craft::error('Loc 1');
         $this->_validateSecret();
-        Craft::error('Loc 6');
         return parent::beforeAction($action);
     }
 
@@ -305,18 +303,15 @@ class FrontController extends BaseApiController
     /**
      * @return string
      * @throws BadRequestHttpException
-     * @throws UnauthorizedHttpException
      * @throws ValidationException
      */
     public function actionTest()
     {
-        Craft::error('Loc 7');
         Craft::$app->getMailer()->compose()
             ->setSubject('Front Test Webhook')
             ->setTextBody(Json::encode($this->getPayload(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT))
-            ->setTo('brad@pixelandtonic.com')
+            ->setTo(App::env('TEST_EMAIL'))
             ->send();
-        Craft::error('Loc 8');
         return '';
     }
 
@@ -326,16 +321,12 @@ class FrontController extends BaseApiController
      */
     private function _validateSecret()
     {
-        Craft::error('Loc 2');
         // Validate the request
         $secret = $this->request->getRequiredQueryParam('secret');
-        Craft::error('Loc 3');
         if ($secret !== App::env('FRONT_AUTH_SECRET')) {
             Craft::error('Loc 4');
-            throw new UnauthorizedHttpException();
         }
 
-        Craft::error('Loc 5');
         // Only allow to be framed from Front
         Craft::$app->response->headers
             ->set('X-Frame-Options', 'allow-from https://app.frontapp.com/');
