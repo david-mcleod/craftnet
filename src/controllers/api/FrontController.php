@@ -71,12 +71,15 @@ class FrontController extends BaseApiController
     {
         Craft::error('Loc 1');
         $payload = $this->getPayload('front-create-ticket');
-        Craft::error('Loc 1a: '.print_r($payload, true));
-        $email = mb_strtolower($payload->email);
+        $email = $payload->conversation->recipients[0]->email;
+        $tags = $payload->conversation->tags;
+        $conversationId = $payload->conversation->id;
+        Craft::error('Loc 1a email: '.$email);
+        $email = mb_strtolower($email);
         $plan = Front::plan($email);
         Craft::error('Loc 2: plan'.$plan);
-        Craft::error('Loc 3: payloadTags'.$payload->tags);
-        $tags = array_filter(explode(' ', $payload->tags), function($tag) {
+        Craft::error('Loc 3: payloadTags'.$tags);
+        $tags = array_filter(explode(' ', $tags), function($tag) {
             return (
                 $tag &&
                 !in_array($tag, [
@@ -87,19 +90,19 @@ class FrontController extends BaseApiController
             );
         });
 
-        $tags[] = $plan;
-Craft::error('Loc 4: id'.$payload->id);
+        $newTags[] = $plan;
+        Craft::error('Loc 4: id'.$conversationId);
         $this->trigger(self::EVENT_UPDATE_TICKET, new FrontEvent([
-            'ticketId' => $payload->id,
+            'ticketId' => $conversationId,
             'email' => $email,
-            'tags' => $tags,
+            'tags' => $newTags,
             'plan' => $plan,
         ]));
 
         // Add the tag to the ticket
         $client = Front::client();
-        $client->request('PATCH', 'https://api2.frontapp.com/conversations/'.$payload->id, [
-            'body' => Json::encode(['tag_ids' => $tags])
+        $client->request('PATCH', 'https://api2.frontapp.com/conversations/'.$conversationId, [
+            'body' => Json::encode(['tag_ids' => $newTags])
         ]);
 
         return '';
