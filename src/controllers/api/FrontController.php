@@ -71,7 +71,7 @@ class FrontController extends BaseApiController
     {
         Craft::error('Loc 1');
         $payload = $this->getPayload('front-create-ticket');
-        $email = $payload->conversation->recipients[0]->email;
+        $email = $payload->conversation->recipient->handle;
         $tags = $payload->conversation->tags;
         $conversationId = $payload->conversation->id;
         Craft::error('Loc 1a email: '.$email);
