@@ -77,9 +77,9 @@ class FrontController extends BaseApiController
         Craft::error('Loc 1a email: '.$email);
         $email = mb_strtolower($email);
         $plan = Front::plan($email);
-        Craft::error('Loc 2: plan'.$plan);
-        Craft::error('Loc 3: payloadTags'.$tags);
-        $tags = array_filter(explode(' ', $tags), function($tag) {
+        Craft::error('Loc 2: plan: '.$plan);
+        Craft::error('Loc 3: payloadTags: '.print_r($tags));
+        $newTags = array_filter(explode(' ', $tags), function($tag) {
             return (
                 $tag &&
                 !in_array($tag, [
