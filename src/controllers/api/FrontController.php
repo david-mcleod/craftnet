@@ -69,18 +69,11 @@ class FrontController extends BaseApiController
      */
     public function actionCreateTicket()
     {
-        Craft::error('Loc 1');
         $payload = $this->getPayload('front-create-ticket');
         $email = $payload->conversation->recipient->handle;
-        $tags = $payload->conversation->tags;
         $conversationId = $payload->conversation->id;
-        Craft::error('Loc 1a email: '.$email);
         $email = mb_strtolower($email);
         $plan = Front::plan($email);
-        Craft::error('Loc 2: plan: '.$plan);
-        foreach ($tags as $key => $tag) {
-            Craft::error('Loc 3: payloadTag['.$key.']: '.$tag);
-        }
 
         $plans = [
             DeveloperSupportController::PLAN_BASIC => '53434825',
@@ -93,7 +86,6 @@ class FrontController extends BaseApiController
             $tag = $plans[$plan];
         }
 
-        Craft::error('Loc 4: id'.$conversationId);
         $this->trigger(self::EVENT_UPDATE_TICKET, new FrontEvent([
             'ticketId' => $conversationId,
             'email' => $email,
