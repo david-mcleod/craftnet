@@ -82,30 +82,29 @@ class FrontController extends BaseApiController
             Craft::error('Loc 3: payloadTag['.$key.']: '.$tag);
         }
 
-        $newTags = array_filter($tags, function($tag) {
-            return (
-                $tag &&
-                !in_array($tag, [
-                    DeveloperSupportController::PLAN_BASIC,
-                    DeveloperSupportController::PLAN_PRO,
-                    DeveloperSupportController::PLAN_PREMIUM,
-                ], true)
-            );
-        });
+        $plans = [
+            DeveloperSupportController::PLAN_BASIC => '53434825',
+            DeveloperSupportController::PLAN_PRO => '53434697',
+            DeveloperSupportController::PLAN_PREMIUM => '53434761',
+        ];
 
-        $newTags[] = $plan;
+        $tag = $plans['basic'];
+        if (in_array($plan, [DeveloperSupportController::PLAN_PRO, DeveloperSupportController::PLAN_PREMIUM], true)) {
+            $tag = $plans[$plan];
+        }
+
         Craft::error('Loc 4: id'.$conversationId);
         $this->trigger(self::EVENT_UPDATE_TICKET, new FrontEvent([
             'ticketId' => $conversationId,
             'email' => $email,
-            'tags' => $newTags,
             'plan' => $plan,
         ]));
 
         // Add the tag to the ticket
         $client = Front::client();
-        $client->request('PATCH', 'https://api2.frontapp.com/conversations/'.$conversationId, [
-            'body' => Json::encode(['tag_ids' => $newTags])
+
+        $client->request('POST', 'https://api2.frontapp.com/conversations/'.$conversationId.'/tags/', [
+            'body' => Json::encode(['tag_ids' => $tag])
         ]);
 
         return '';
