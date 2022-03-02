@@ -75,10 +75,11 @@ class CmsLicenseManager extends Component
      */
     public function normalizeDomain(string $url, bool $allowCustom = false)
     {
+        $host = parse_url($url, PHP_URL_HOST) ?: $url;
         $isPunycoded = StringHelper::contains($url, 'xn--', false);
 
         if ($isPunycoded) {
-            $url = Idna::toUnicode($url, 0)->result();
+            $host = Idna::toUnicode($host, 0)->result();
         }
 
         $list = Craft::$app->getCache()->get('publicSuffixList');
@@ -90,14 +91,11 @@ class CmsLicenseManager extends Component
 
         // ignore if it's a nonstandard port
         $port = parse_url($url, PHP_URL_PORT);
-        if ($port) {
-            if ($port != 80 && $port != 443) {
-                return null;
-            }
-            $url = mb_substr($url, 0, strpos($url, ':'));
+        if ($port && $port != 80 && $port != 443) {
+            return null;
         }
 
-        $result = $list->resolve($url);
+        $result = $list->resolve($host);
 
         // Account for things like "localhost" - one word segments
         if (

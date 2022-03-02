@@ -180,19 +180,24 @@ class UserBehavior extends Behavior
         $isAdmin = $currentUser && ($currentUser->isInGroup('admins') || $currentUser->admin);
         $request = Craft::$app->getRequest();
 
-        if ($currentUser) {
-            $existingPartnerStatus = $currentUser->enablePartnerFeatures;
-            $existingShowcaseStatus = $currentUser->enableShowcaseFeatures;
-        }
-
         if (
             $currentUser &&
             !$isAdmin &&
             $request->getIsSiteRequest() &&
-            $request->getIsPost() &&
-            (((bool)$request->getBodyParam('fields.enableShowcaseFeatures') !== $existingShowcaseStatus) || ((bool)$request->getBodyParam('fields.enablePartnerFeatures') !== $existingPartnerStatus))
+            $request->getIsPost()
         ) {
-            $event->isValid = false;
+            $postedEnableShowcaseFeatures = $request->getBodyParam('fields.enableShowcaseFeatures');
+            $postedEnablePartnerFeatures = $request->getBodyParam('fields.enablePartnerFeatures');
+
+            if (
+                ($postedEnableShowcaseFeatures !== null && $postedEnableShowcaseFeatures != $currentUser->enableShowcaseFeatures) ||
+                ($postedEnablePartnerFeatures !== null && $postedEnablePartnerFeatures != $currentUser->enablePartnerFeatures)
+            ) {
+                Craft::warning("There was a validation error while saving the user's partner status", __METHOD__);
+                $event->sender->addError('enablePartnerFeatures', "There was a problem saving your partner status.");
+                $event->isValid = false;
+            }
+
         }
     }
 
