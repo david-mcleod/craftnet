@@ -71,6 +71,7 @@ class FrontController extends BaseApiController
     {
         Craft::error('Loc 1');
         $payload = $this->getPayload('front-create-ticket');
+        Craft::error('Loc 1a: '.print_r($payload, true));
         $email = mb_strtolower($payload->email);
         $plan = Front::plan($email);
         Craft::error('Loc 2: plan'.$plan);
