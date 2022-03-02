@@ -1186,10 +1186,10 @@ class PackageManager extends Component
         $pluginData = ArrayHelper::index($pluginData, null, 'packageId');
         $compatData = [];
 
-        foreach ($pluginData as $packageId => $releases) {
+        foreach ($pluginData as $releases) {
             $foundMatch = false;
             foreach ($releases as $release) {
-                if (Semver::satisfies($cmsRelease->version, $release['constraints'])) {
+                if (Semver::satisfies($cmsRelease->version, $this->tightenConstraint($release['constraints']))) {
                     $compatData[] = [$release['versionId'], $cmsRelease->id];
                     $foundMatch = true;
                 } else if ($foundMatch) {
@@ -1227,7 +1227,7 @@ class PackageManager extends Component
         }
 
         $compatData = [];
-        $cmsConstraint = $pluginRelease->require['craftcms/cms'];
+        $cmsConstraint = $this->tightenConstraint($pluginRelease->require['craftcms/cms']);
 
         foreach ($this->getAllReleases('craftcms/cms', null) as $cmsRelease) {
             if (Semver::satisfies($cmsRelease->version, $cmsConstraint)) {
@@ -1241,6 +1241,17 @@ class PackageManager extends Component
                 'cmsVersionId',
             ], $compatData, false)
             ->execute();
+    }
+
+    /**
+     * Tightens `>=` constraints to `^` because `>=` shouldn’t exist.
+     *
+     * @param string $constraint
+     * @return string
+     */
+    private function tightenConstraint(string $constraint): string
+    {
+        return str_replace('>=', '^', $constraint);
     }
 
     /**
