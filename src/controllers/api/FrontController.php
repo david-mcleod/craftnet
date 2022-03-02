@@ -94,9 +94,9 @@ class FrontController extends BaseApiController
         ]));
 
         // Add the tag to the ticket
-        Front::client()->tickets()->update($payload->id, [
-            'priority' => 'normal',
-            'tags' => $tags,
+        $client = Front::client();
+        $client->request('PATCH', 'https://api2.frontapp.com/conversations/'.$payload->id, [
+            'body' => Json::encode(['tag_ids' => $tags])
         ]);
 
         return '';
@@ -303,15 +303,19 @@ class FrontController extends BaseApiController
     /**
      * @return string
      * @throws BadRequestHttpException
+     * @throws UnauthorizedHttpException
      * @throws ValidationException
      */
     public function actionTest()
     {
+        $this->_validateSecret();
+
         Craft::$app->getMailer()->compose()
             ->setSubject('Front Test Webhook')
             ->setTextBody(Json::encode($this->getPayload(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT))
             ->setTo(App::env('TEST_EMAIL'))
             ->send();
+
         return '';
     }
 
@@ -324,7 +328,7 @@ class FrontController extends BaseApiController
         // Validate the request
         $secret = $this->request->getRequiredQueryParam('secret');
         if ($secret !== App::env('FRONT_AUTH_SECRET')) {
-            Craft::error('Loc 4');
+            throw new UnauthorizedHttpException();
         }
 
         // Only allow to be framed from Front
