@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "conversation": {
+      "type": "object",
+      "required": true,
+      "properties": {
+        "recipient": {
+          "type": "object",
+          "required": true,
+          "properties": {
+            "handle": {
+              "type": "string",
+              "required": true,
+              "format": "email"
+            },
+            "role": {
+              "type": "string",
+              "required": true,
+              "pattern": "^from$"
+            }
+          }
+        },
+        "tags": {
+          "type": "array",
+          "required": true
+        },
+        "id": {
+          "type": "string",
+          "required": true
+        }
+      }
+    }
+  }
+}
