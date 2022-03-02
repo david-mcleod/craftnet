@@ -851,12 +851,15 @@ class PackageManager extends Component
             $deletedVersions = array_diff($normalizedStoredVersions, $normalizedVcsVersions);
             $newVersions = array_diff($normalizedVcsVersions, $normalizedStoredVersions);
 
+            if ($onlyVersion) {
+                $onlyVersion = (new VersionParser())->normalize($onlyVersion);
+            }
+
             $updatedVersions = [];
             foreach (array_intersect($normalizedStoredVersions, $normalizedVcsVersions) as $version) {
                 if (
-                    $force ||
-                    $version === $onlyVersion ||
-                    $storedVersionInfo[$version]['sha'] !== $vcsVersionInfo[$version]['sha']
+                    ($onlyVersion === null || $version === $onlyVersion) &&
+                    ($force || $storedVersionInfo[$version]['sha'] !== $vcsVersionInfo[$version]['sha'])
                 ) {
                     $updatedVersions[] = $version;
                 }
