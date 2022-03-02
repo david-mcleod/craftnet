@@ -896,7 +896,32 @@ EOL;
             $longDescription = Markdown::process($plugin->longDescription, 'gfm');
             $longDescription = HtmlPurifier::process($longDescription);
 
-            $data['compatibility'] = 'Craft 3';
+            // Figure out which versions of Craft the plugin is compatible with
+            $cmsConstraints = [
+                'Craft 3' => '^3.0',
+                'Craft 4' => '^4.0',
+            ];
+            $compatibleCmsVersions = [];
+            $packageManager = $this->module->getPackageManager();
+            foreach ($cmsConstraints as $cmsVersionLabel => $cmsConstraint) {
+                if ($plugin->compatibleCmsVersion && Semver::satisfies($plugin->compatibleCmsVersion, $cmsConstraint)) {
+                    // The plugin was loaded with a similar Craft version in mind. no need to fetch the Craft version ourselves
+                    $compatibleCmsVersions[] = $cmsVersionLabel;
+                } else {
+                    $latestCmsVersion = $packageManager->getLatestVersion('craftcms/cms', 'dev', $cmsConstraint);
+                    if ($latestCmsVersion) {
+                        $compatible = Plugin::find()
+                            ->id($plugin->id)
+                            ->withLatestReleaseInfo(cmsVersion: $latestCmsVersion)
+                            ->exists();
+                        if ($compatible) {
+                            $compatibleCmsVersions[] = $cmsVersionLabel;
+                        }
+                    }
+                }
+            }
+
+            $data['compatibility'] = implode(', ', $compatibleCmsVersions);
             $data['status'] = $plugin->status;
             $data['iconId'] = $plugin->iconId;
             $data['longDescription'] = $longDescription;

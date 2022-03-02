@@ -347,6 +347,11 @@ class Plugin extends Element
     public $latestVersionTime;
 
     /**
+     * @var string|null The Craft CMS version that the latest version must have been compatible with
+     */
+    public ?string $compatibleCmsVersion = null;
+
+    /**
      * @var int The number of active installs.
      */
     public $activeInstalls = 0;

@@ -300,6 +300,22 @@ class PluginQuery extends ElementQuery
     /**
      * @inheritdoc
      */
+    public function afterPopulate(array $elements): array
+    {
+        if ($this->cmsVersion) {
+            foreach ($elements as $element) {
+                if ($element instanceof Plugin) {
+                    $element->compatibleCmsVersion = $this->cmsVersion;
+                }
+            }
+        }
+
+        return parent::afterPopulate($elements);
+    }
+
+    /**
+     * @inheritdoc
+     */
     protected function statusCondition(string $status)
     {
         switch ($status) {
