@@ -104,7 +104,7 @@ class FrontController extends BaseApiController
         $client = Front::client();
 
         $client->request('POST', 'https://api2.frontapp.com/conversations/'.$conversationId.'/tags/', [
-            'body' => Json::encode(['tag_ids' => $tag])
+            'body' => Json::encode(['tag_ids' => [$tag]])
         ]);
 
         return '';
