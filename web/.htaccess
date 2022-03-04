@@ -1,9 +1,6 @@
 <IfModule mod_headers.c>
   Header set X-Content-Type-Options "nosniff"
-  Header set X-Frame-Options SAMEORIGIN
-  Header append X-Frame-Options "ALLOW-FROM https://*.frontapp.com"
-  Header append X-Frame-Options "ALLOW-FROM https://*.frontapplication.com"
-  Header append X-Frame-Options "ALLOW-FROM https://*.craftcms.com"
+  Header set X-Frame-Options "ALLOW-FROM https://app.frontapp.com"
 </IfModule>
 
 <IfModule mod_rewrite.c>
