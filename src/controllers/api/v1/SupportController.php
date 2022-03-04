@@ -55,8 +55,8 @@ class SupportController extends BaseApiController
         }
         if ($cmsLicense) {
             $licenseInfo = [
-                '`' . $cmsLicense->getShortKey() . '` (' . ucfirst($cmsLicense->editionHandle) . ')',
-                'from ' . $formatter->asDate($cmsLicense->dateCreated, Locale::LENGTH_SHORT),
+                '`' . $cmsLicense->getShortKey() . '`',
+                'created on ' . $formatter->asDate($cmsLicense->dateCreated, Locale::LENGTH_SHORT),
             ];
             if ($cmsLicense->expirable && $cmsLicense->expiresOn) {
                 $licenseInfo[] .= ($cmsLicense->expired ? 'expired on' : 'expires on') .
