@@ -1,7 +1,7 @@
 <IfModule mod_headers.c>
   Header set X-Content-Type-Options "nosniff"
   Header set X-Frame-Options "SAMEORIGIN"
-  Header set Content-Security-Policy "frame-ancestors 'https://app.frontapp.com/' 'https://id.craftcms.com/' 'https://api.craftcms.com/';"
+  Header set Content-Security-Policy "frame-ancestors 'https://*.frontapp.com' 'https://*.frontapplication.com' 'https://*.craftcms.com/';"
 </IfModule>
 
 <IfModule mod_rewrite.c>
