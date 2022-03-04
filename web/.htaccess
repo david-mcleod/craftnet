@@ -1,6 +1,7 @@
 <IfModule mod_headers.c>
   Header set X-Content-Type-Options "nosniff"
   Header set X-Frame-Options "SAMEORIGIN"
+  Header set Content-Security-Policy "frame-ancestors 'self' https://app.frontapp.com;"
 </IfModule>
 
 <IfModule mod_rewrite.c>
