@@ -326,7 +326,7 @@ class FrontController extends BaseApiController
     private function _validateSecret()
     {
         // Validate the request
-        $secret = $this->request->getRequiredQueryParam('secret');
+        $secret = $this->request->getRequiredQueryParam('auth_secret');
         if ($secret !== App::env('FRONT_AUTH_SECRET')) {
             throw new UnauthorizedHttpException();
         }
