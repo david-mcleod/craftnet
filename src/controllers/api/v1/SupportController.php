@@ -183,7 +183,7 @@ class SupportController extends BaseApiController
 
         $decodedResponse = Json::decodeIfJson($response->getBody()->getContents());
         if ($decodedResponse) {
-            $conversationId = $decodedResponse->message_uid;
+            $conversationId = $decodedResponse['message_uid'];
 
             $this->trigger(self::EVENT_CREATE_TICKET, new FrontEvent([
                 'ticketId' => $conversationId,
