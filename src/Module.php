@@ -401,8 +401,6 @@ class Module extends \yii\base\Module
             Craft::$app->getResponse()->getHeaders()->set('Access-Control-Allow-Origin', '*');
         }
 
-        Craft::$app->getResponse()->getHeaders()->set('X-Frame-Options', 'sameorigin');
-
         Event::on(UsersController::class, UsersController::EVENT_BEFORE_ACTION, function(ActionEvent $event) use ($request) {
             if ($event->action->id == 'save-user') {
                 $fieldsLocation = $request->getParam('fieldsLocation') ?? 'fields';
