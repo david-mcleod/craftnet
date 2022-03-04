@@ -22,6 +22,7 @@ abstract class Front
     public static function client(): Client
     {
         return Craft::createGuzzleClient([
+            'base_uri' => 'https://api2.frontapp.com',
             'headers' => [
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',

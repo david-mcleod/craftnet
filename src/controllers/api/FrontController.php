@@ -95,7 +95,7 @@ class FrontController extends BaseApiController
         // Add the tag to the ticket
         $client = Front::client();
 
-        $client->request('POST', 'https://api2.frontapp.com/conversations/'.$conversationId.'/tags/', [
+        $client->request('POST', 'conversations/'.$conversationId.'/tags/', [
             'body' => Json::encode(['tag_ids' => [$tag]])
         ]);
 
