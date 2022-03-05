@@ -117,6 +117,7 @@ class FrontController extends BaseApiController
      */
     public function actionLoadData(): Response
     {
+        Craft::error('loading data');
         $body = Json::decode(Craft::$app->request->getRawBody());
         $email = $body['email'] ?? null;
 
