@@ -333,6 +333,6 @@ class FrontController extends BaseApiController
 
         // Only allow to be framed from Front
         Craft::$app->response->headers
-            ->set('Content-Security-Policy', 'frame-ancestors https://app.frontapp.com/');
+            ->set('Content-Security-Policy', 'frame-ancestors https://*.frontapp.com https://*.frontapplication.com https://*.craftcms.com');
     }
 }
