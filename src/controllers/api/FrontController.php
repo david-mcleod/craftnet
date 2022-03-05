@@ -330,5 +330,9 @@ class FrontController extends BaseApiController
         if ($secret !== App::env('FRONT_AUTH_SECRET')) {
             throw new UnauthorizedHttpException();
         }
+
+        // Only allow to be framed from Front
+        Craft::$app->response->headers
+            ->set('X-Frame-Options', 'allow-from https://app.frontapp.com/');
     }
 }
