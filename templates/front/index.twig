@@ -154,7 +154,7 @@ var app = new Vue({
             this.loading = true;
 
             superagent
-                .post('/actions/craftnet/front/load-data?auth_secret=' + window.secret)
+                .post('/actions/craftnet/api/front/load-data?auth_secret=' + window.secret)
                 .send({email: email})
                 .set('accept', 'json')
                 .end((err, res) => {
