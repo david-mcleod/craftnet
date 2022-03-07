@@ -114,6 +114,7 @@ return [
     'putyourlightson.dev',
     'rantsports.org',
     'redeye.dev',
+    'remdev.xyz',
     'runcloud.site',
     'sandboxdsm.com',
     'servd.dev',
