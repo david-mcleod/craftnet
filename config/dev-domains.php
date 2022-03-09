@@ -155,4 +155,5 @@ return [
     'wrkcpt.dev',
     'xip.io',
     'yourstruly.space',
+    'ploi.link',
 ];
