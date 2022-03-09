@@ -106,6 +106,7 @@ return [
     'our-staging-server.net',
     'pc-web.dev',
     'pennystamps.dev',
+    'ploi.link',
     'preflight.space',
     'preproduction.io',
     'preview.dev',
@@ -155,5 +156,4 @@ return [
     'wrkcpt.dev',
     'xip.io',
     'yourstruly.space',
-    'ploi.link',
 ];
