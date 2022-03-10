@@ -17,6 +17,7 @@ use craft\helpers\StringHelper;
 use craft\web\Controller;
 use craft\web\UploadedFile;
 use craftnet\errors\InvalidSvgException;
+use craftnet\helpers\Cache;
 use craftnet\Module;
 use craftnet\plugins\Plugin;
 use craftnet\plugins\PluginEdition;
@@ -237,6 +238,7 @@ JS;
     public function actionSave()
     {
         $isCpRequest = $this->request->getIsCpRequest();
+        $canManagePlugins = Craft::$app->getUser()->checkPermission('craftnet:managePlugins');
         $newPlugin = false;
 
         if ($pluginId = $this->request->getBodyParam('pluginId')) {
@@ -245,7 +247,7 @@ JS;
                 throw new NotFoundHttpException('Invalid plugin ID: ' . $pluginId);
             }
 
-            if (!Craft::$app->getUser()->checkPermission('craftnet:managePlugins') && Craft::$app->getUser()->getId() !== $plugin->developerId) {
+            if (!$canManagePlugins && Craft::$app->getUser()->getId() !== $plugin->developerId) {
                 throw new ForbiddenHttpException('User is not permitted to perform this action');
             }
         } else {
@@ -272,32 +274,43 @@ JS;
         // ---------------------------------------------------------------------
 
         // Only plugin managers are able to change developer for a plugin
-        if (Craft::$app->getUser()->checkPermission('craftnet:managePlugins') && isset($this->request->getBodyParam('developerId')[0])) {
+        if ($canManagePlugins && isset($this->request->getBodyParam('developerId')[0])) {
             $plugin->developerId = $this->request->getBodyParam('developerId')[0];
         } else if (!$plugin->developerId) {
             $plugin->developerId = Craft::$app->getUser()->getId();
         }
 
-        // Name & handle
-        // ---------------------------------------------------------------------
-
         $newName = false;
         $newHandle = false;
+        $newIcon = false;
 
-        if ($plugin->name != ($plugin->name = $this->request->getBodyParam('name'))) {
+        $pluginName = $this->request->getBodyParam('name');
+
+        if ($pluginName && $pluginName != $plugin->name) {
+            $plugin->name = $pluginName;
             $newName = true;
         }
 
-        if ($plugin->handle != ($plugin->handle = $this->request->getBodyParam('handle'))) {
-            $newHandle = true;
+        if ($isCpRequest || $newPlugin) {
+            $pluginHandle = $this->request->getBodyParam('handle');
+            if ($pluginHandle && $pluginHandle != $plugin->handle) {
+                $newHandle = true;
+            }
+
+            $packageName = $this->request->getBodyParam('packageName');
+            if ($packageName && $packageName != $plugin->packageName) {
+                $plugin->packageName = $packageName;
+            }
+
+            $repository = $this->request->getBodyParam('repository');
+            if ($repository && $repository != $plugin->repository) {
+                $plugin->repository = $repository;
+            }
         }
 
         // Basic plugin info
         // ---------------------------------------------------------------------
 
-        $plugin->iconId = $this->request->getBodyParam('iconId')[0] ?? null;
-        $plugin->packageName = $this->request->getBodyParam('packageName');
-        $plugin->repository = $this->request->getBodyParam('repository');
         $plugin->license = $this->request->getBodyParam('license');
         $plugin->shortDescription = $this->request->getBodyParam('shortDescription');
         $plugin->longDescription = $this->request->getBodyParam('longDescription');
@@ -305,6 +318,14 @@ JS;
         $plugin->changelogPath = $this->request->getBodyParam('changelogPath') ?: null;
         $plugin->devComments = $this->request->getBodyParam('devComments') ?: null;
         $plugin->keywords = $this->request->getBodyParam('keywords');
+
+        if ($isCpRequest) {
+            $iconId = $this->request->getBodyParam('iconId')[0] ?? null;
+            if ($iconId && $iconId != $plugin->iconId) {
+                $plugin->iconId = $iconId;
+                $newIcon = true;
+            }
+        }
 
         // Categories
         // ---------------------------------------------------------------------
@@ -355,22 +376,32 @@ JS;
                     // Save as an asset
                     $volume = $volumesService->getVolumeByHandle('icons');
                     $folderId = $volumesService->ensureTopFolder($volume);
+                    $targetFilename = "$plugin->handle.svg";
 
-                    $targetFilename = "{$plugin->handle}.svg";
-
-                    $assetToReplace = Asset::find()
-                        ->folderId($folderId)
-                        ->filename(Db::escapeParam($targetFilename))
-                        ->one();
+                    if (!$newPlugin) {
+                        $assetToReplace = $plugin->getIcon();
+                    } else {
+                        $assetToReplace = null;
+                    }
 
                     if ($assetToReplace) {
                         Craft::$app->getAssets()->replaceAssetFile($assetToReplace, $tempPath, $assetToReplace->filename);
                         $plugin->iconId = $assetToReplace->id;
                     } else {
+                        // Make sure an asset doesn't already exist with the same filename
+                        $exists = Asset::find()
+                            ->folderId($folderId)
+                            ->filename(Db::escapeParam($targetFilename))
+                            ->exists();
+
+                        if ($exists) {
+                            $targetFilename = sprintf('%s-%s.svg', $plugin->handle, StringHelper::randomString(10));
+                        }
+
                         $icon = new Asset([
                             'title' => $plugin->name,
                             'tempFilePath' => $tempPath,
-                            'newLocation' => "{folder:{$folderId}}{$plugin->handle}.svg",
+                            'newLocation' => "{folder:$folderId}$targetFilename",
                         ]);
 
                         if (!Craft::$app->getElements()->saveElement($icon, false)) {
@@ -378,6 +409,7 @@ JS;
                         }
 
                         $plugin->iconId = $icon->id;
+                        $newIcon = true;
                     }
                 }
             }
@@ -656,6 +688,12 @@ JS;
             }
 
             return $this->asJson($return);
+        }
+
+        Cache::invalidate(Cache::TAG_PACKAGES);
+
+        if ($newIcon) {
+            Cache::invalidate(Cache::pluginIconTag($plugin));
         }
 
         Craft::$app->getSession()->setNotice('Plugin saved.');

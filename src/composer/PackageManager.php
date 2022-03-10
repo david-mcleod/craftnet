@@ -16,6 +16,7 @@ use craftnet\composer\jobs\UpdatePackage;
 use craftnet\db\Table;
 use craftnet\errors\MissingTokenException;
 use craftnet\errors\VcsException;
+use craftnet\helpers\Cache;
 use craftnet\Module;
 use craftnet\plugins\Plugin;
 use UnexpectedValueException;
@@ -979,6 +980,8 @@ class PackageManager extends Component
                 if ($plugin !== null) {
                     $this->updatePluginReleaseOrder($plugin);
                 }
+
+                Cache::invalidate(Cache::TAG_PACKAGES);
             } else {
                 if ($isConsole) {
                     Console::output('No new versions to process.');
