@@ -11,6 +11,7 @@ use craftnet\composer\vcs\VcsInterface;
 use craftnet\errors\MissingTokenException;
 use craftnet\Module;
 use craftnet\plugins\Plugin;
+use Github\AuthMethod;
 use Github\Client as GithubClient;
 
 /**
@@ -149,9 +150,6 @@ class Package extends Model
         if (isset($parsed['host']) && $parsed['host'] === 'github.com') {
             [$owner, $repo] = explode('/', trim($parsed['path'], '/'), 2);
 
-            // Create an authenticated GitHub API client
-            $client = new GithubClient();
-
             $token = null;
             if ($this->developerId) {
                 Craft::info('Using package token for ' . $this->name . ': ' . substr($token, 0, 10), __METHOD__);
@@ -170,7 +168,9 @@ class Package extends Model
                 Craft::info("Using fallback token for {$this->name}: " . substr($token, 0, 10), __METHOD__);
             }
 
-            $client->authenticate($token, null, GithubClient::AUTH_ACCESS_TOKEN);
+            // Create an authenticated GitHub API client
+            $client = new GithubClient();
+            $client->authenticate($token, null, AuthMethod::ACCESS_TOKEN);
 
             return new GitHub($this, [
                 'client' => $client,
