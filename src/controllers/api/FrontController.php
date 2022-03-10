@@ -117,6 +117,7 @@ class FrontController extends BaseApiController
      */
     public function actionLoadData(): Response
     {
+        Craft::error('loading data');
         $body = Json::decode(Craft::$app->request->getRawBody());
         $email = $body['email'] ?? null;
 
@@ -333,6 +334,6 @@ class FrontController extends BaseApiController
 
         // Only allow to be framed from Front
         Craft::$app->response->headers
-            ->set('X-Frame-Options', 'allow-from https://app.frontapp.com/');
+            ->set('Content-Security-Policy', 'frame-ancestors https://*.frontapp.com https://*.frontapplication.com https://*.craftcms.com');
     }
 }

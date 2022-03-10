@@ -59,10 +59,10 @@ return [
         'POST    v1/updates' => 'craftnet/api/v1/updates/old',
         'POST    v1/utils/releases-2-changelog' => 'craftnet/api/v1/utils/releases-2-changelog',
         'POST    webhook/github' => 'craftnet/api/webhook/github',
-        'POST    zendesk/create-ticket' => 'craftnet/api/zendesk/create-ticket',
-        'POST    zendesk/test' => 'craftnet/api/zendesk/test',
         'POST    front/create-ticket' => 'craftnet/api/front/create-ticket',
         'POST    front/test' => 'craftnet/api/front/test',
+        'GET     front' => 'craftnet/api/front',
+        'GET     front/get-license-info' => 'craftnet/api/front/get-license-info',
     ],
     'craftId' => [
         'POST    queue/handle-message' => 'craftnet/queue/handle-message',
@@ -84,9 +84,6 @@ return [
         'oauth/authorize' => 'oauth-server/oauth/authorize',
         'oauth/access-token' => 'oauth-server/oauth/access-token',
         'oauth/revoke' => 'oauth-server/oauth/revoke',
-
-        'front' => 'craftnet/front',
-        'front/get-license-info' => 'craftnet/front/get-license-info',
 
         // Catch-all route for Vue when people reload the page.
         '<url:(?!setpassword$).*>' => 'craftnet/id/index',

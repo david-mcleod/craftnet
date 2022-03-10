@@ -9,8 +9,6 @@ use craft\helpers\App;
 use craftnet\controllers\id\DeveloperSupportController;
 use GuzzleHttp\Client;
 use yii\db\Expression;
-use Zendesk\API\HttpClient;
-use Zendesk\API\Utilities\Auth;
 
 abstract class Front
 {

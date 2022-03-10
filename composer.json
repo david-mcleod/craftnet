@@ -23,8 +23,7 @@
     "tecnickcom/tcpdf": "^6.2",
     "thamtech/yii2-ratelimiter-advanced": "^0.5",
     "yiisoft/yii2-redis": "^2.0.6",
-    "yiisoft/yii2-shell": "^2.0",
-    "zendesk/zendesk_api_client_php": "^2.2"
+    "yiisoft/yii2-shell": "^2.0"
   },
   "require-dev": {
     "codeception/codeception": "^4.0.0",
@@ -38,10 +37,7 @@
   "autoload": {
     "psr-4": {
       "craftnet\\": "src/"
-    },
-    "files": [
-      "fixes/psr7.php"
-    ]
+    }
   },
   "config": {
     "optimize-autoloader": true,
