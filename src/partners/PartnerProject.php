@@ -36,44 +36,29 @@ class PartnerProject extends Model
      * @inheritdoc
      * @return array
      */
-    public function rules()
+    protected function defineRules(): array
     {
-        $rules = parent::rules();
-
-        $rules[] = [
-            ['name', 'url'], 'trim',
-        ];
-
-        $rules[] = [
-            ['name', 'url'],
-            'required',
-            'on' => [
-                Element::SCENARIO_DEFAULT,
-                Element::SCENARIO_LIVE,
-                Partner::SCENARIO_PROJECTS,
+        return [
+            [['name', 'url'], 'trim'],
+            [['name', 'url'], 'required', 'on' => [Element::SCENARIO_DEFAULT, Element::SCENARIO_LIVE, Partner::SCENARIO_PROJECTS]],
+            [
+                'screenshots',
+                ArrayValidator::class,
+                'skipOnEmpty' => false,
+                'min' => 1,
+                'max' => 5,
+                'tooFew' => 'Please provide at least one screenshot',
+                'tooMany' => 'Please limit to 5 screenshots',
+                'on' => [
+                    Element::SCENARIO_DEFAULT,
+                    Element::SCENARIO_LIVE,
+                    Partner::SCENARIO_PROJECTS,
+                ],
             ],
+            ['url', 'url', 'enableIDN' => true],
+            ['role', 'string', 'max' => 55],
+            ['withCraftCommerce', 'default', 'value' => false],
         ];
-
-        $rules[] = [
-            'screenshots',
-            ArrayValidator::class,
-            'skipOnEmpty' => false,
-            'min' => 1,
-            'max' => 5,
-            'tooFew' => 'Please provide at least one screenshot',
-            'tooMany' => 'Please limit to 5 screenshots',
-            'on' => [
-                Element::SCENARIO_DEFAULT,
-                Element::SCENARIO_LIVE,
-                Partner::SCENARIO_PROJECTS,
-            ],
-        ];
-
-        $rules[] = ['url', 'url', 'enableIDN' => true];
-        $rules[] = ['role', 'string', 'max' => 55];
-        $rules[] = ['withCraftCommerce', 'default', 'value' => false];
-
-        return $rules;
     }
 
     /**

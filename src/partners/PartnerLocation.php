@@ -26,30 +26,15 @@ class PartnerLocation extends Model
     /**
      * @return array
      */
-    public function rules()
+    protected function defineRules(): array
     {
-        $rules = parent::rules();
-
-        $rules[] = [
+        return [
             [
-                'title',
-                'addressLine1',
-                'city',
-                'state',
-                'zip',
-                'country',
-                'email',
+                ['title', 'addressLine1', 'city', 'state', 'zip', 'country', 'email'],
+                'required',
+                'on' => [Element::SCENARIO_DEFAULT, Element::SCENARIO_LIVE, Partner::SCENARIO_LOCATIONS],
             ],
-            'required',
-            'on' => [
-                Element::SCENARIO_DEFAULT,
-                Element::SCENARIO_LIVE,
-                Partner::SCENARIO_LOCATIONS,
-            ],
+            ['email', 'email', 'enableIDN' => true],
         ];
-
-        $rules[] = ['email', 'email', 'enableIDN' => true];
-
-        return $rules;
     }
 }

@@ -108,19 +108,11 @@ class PartnerHistory extends Model implements JsonSerializable
     /**
      * @return array
      */
-    public function rules()
+    protected function defineRules(): array
     {
-        $rules = parent::rules();
-
-        $rules[] = [
-            [
-                'partnerId',
-                'message',
-            ],
-            'required',
+        return [
+            [['partnerId', 'message'], 'required'],
         ];
-
-        return $rules;
     }
 
     /**
