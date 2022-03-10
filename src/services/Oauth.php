@@ -28,6 +28,12 @@ class Oauth extends Component
     public $appTypes = [];
 
     /**
+     * @var array
+     * @see getAuthTokenByUserId()
+     */
+    private $_authTokens = [];
+
+    /**
      * Lists the repos for a given VSC type. Not going through composer/vsc classes
      * because they expect the package/plugin to already exist.
      *
@@ -123,15 +129,19 @@ class Oauth extends Component
      * @param string $providerClass
      * @param int $userId
      *
-     * @return string|null|false
+     * @return string|null
      */
     public function getAuthTokenByUserId(string $providerClass, int $userId)
     {
-        return (new Query())
-            ->select(['accessToken'])
-            ->from([Table::VCSTOKENS])
-            ->where(['userId' => $userId, 'provider' => $providerClass])
-            ->scalar();
+        if (!isset($this->_authTokens[$providerClass][$userId])) {
+            $this->_authTokens[$providerClass][$userId] = (new Query())
+                ->select(['accessToken'])
+                ->from([Table::VCSTOKENS])
+                ->where(['userId' => $userId, 'provider' => $providerClass])
+                ->scalar();
+        }
+
+        return $this->_authTokens[$providerClass][$userId] ?: null;
     }
 
     /**
