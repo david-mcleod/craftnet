@@ -409,8 +409,9 @@ JS;
                         }
 
                         $plugin->iconId = $icon->id;
-                        $newIcon = true;
                     }
+
+                    $newIcon = true;
                 }
             }
 
