@@ -821,6 +821,16 @@ EOL;
     }
 
     /**
+     * Returns whether plugin install history should be included in plugin details.
+     *
+     * @return bool
+     */
+    protected function withInstallHistory(): bool
+    {
+        return (bool)$this->request->getQueryParam('withInstallHistory');
+    }
+
+    /**
      * Returns whether plugin icon SVG contents should be included in plugin details.
      *
      * @return bool
@@ -955,7 +965,9 @@ EOL;
                 $data['phpConstraint'] = $phpConstraint;
                 $data['incompatiblePhpVersion'] = $incompatiblePhpVersion;
             }
+        }
 
+        if ($this->withInstallHistory()) {
             // Install count history
             $installHistory = (new Query())
                 ->select(['activeInstalls', 'date'])
