@@ -972,6 +972,7 @@ EOL;
             $installHistory = (new Query())
                 ->select(['activeInstalls', 'date'])
                 ->from(['craftnet_plugin_installs'])
+                ->where(['pluginId' => $plugin->id])
                 ->orderBy(['date' => SORT_DESC])
                 ->limit(30)
                 ->all();
