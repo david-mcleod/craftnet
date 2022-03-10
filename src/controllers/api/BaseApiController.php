@@ -5,6 +5,7 @@ namespace craftnet\controllers\api;
 use Composer\Semver\Comparator;
 use Composer\Semver\Semver;
 use Craft;
+use craft\db\Query;
 use craft\elements\User;
 use craft\errors\InvalidPluginException;
 use craft\helpers\App;
@@ -944,6 +945,15 @@ EOL;
                 $data['phpConstraint'] = $phpConstraint;
                 $data['incompatiblePhpVersion'] = $incompatiblePhpVersion;
             }
+
+            // Install count history
+            $installHistory = (new Query())
+                ->select(['activeInstalls', 'date'])
+                ->from(['craftnet_plugin_installs'])
+                ->orderBy(['date' => SORT_DESC])
+                ->limit(30)
+                ->all();
+            $data['installHistory'] = array_reverse($installHistory);
         }
 
         if ($this->withPluginIcons()) {
@@ -1203,7 +1213,7 @@ EOL;
         if (!isset($this->_cmsVersionForPluginQueries)) {
             if ($cmsConstraint = $this->request->getQueryParam('cmsConstraint')) {
                 $cmsVersion = $this->module->getPackageManager()
-                    ->getLatestVersion('craftcms/cms', null, $cmsConstraint) ?? '0.0';
+                        ->getLatestVersion('craftcms/cms', null, $cmsConstraint) ?? '0.0';
             } else {
                 $cmsVersion = $this->cmsVersion;
             }
