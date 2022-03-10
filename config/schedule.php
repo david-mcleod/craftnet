@@ -32,3 +32,9 @@ $schedule->command('craftnet/plugins/update-install-counts')
     ->withoutOverlapping()
     ->sendOutputTo('/var/app/current/cron/plugins-update-install-counts.log')
     ->emailOutputTo([$deliveryEmail]);
+
+$schedule->command('craftnet/plugins/update-issue-stats')
+    ->daily()
+    ->withoutOverlapping()
+    ->sendOutputTo('/var/app/current/cron/plugins-update-issue-stats.log')
+    ->emailOutputTo([$deliveryEmail]);

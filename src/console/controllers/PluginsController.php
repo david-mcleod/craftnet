@@ -4,14 +4,20 @@ namespace craftnet\console\controllers;
 
 use Craft;
 use craft\db\Query;
+use craft\helpers\DateTimeHelper;
 use craft\helpers\Db;
 use craftnet\Module;
 use craftnet\plugins\Plugin;
 use DateTime;
 use DateTimeZone;
+use Github\AuthMethod;
+use Github\Client as GithubClient;
+use Github\ResultPager;
+use Throwable;
 use yii\console\Controller;
 use yii\console\ExitCode;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Console;
 
 /**
  * Manages plugins.
@@ -85,6 +91,131 @@ OUTPUT;
                     'date' => $timestamp,
                 ])
                 ->execute();
+        }
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Updates plugin issue statistics
+     *
+     * @param string|null $pluginHandle The plugin handle to update. If empty, all plugins will be updated.
+     *
+     * @return int
+     */
+    public function actionUpdateIssueStats(?string $pluginHandle = null): int
+    {
+        $oathService = $this->module->getOauth();
+        $periodDates = [
+            30 => new DateTime('-30 days'),
+            7 => new DateTime('-7 days'),
+            3 => new DateTime('-3 days'),
+            1 => new DateTime('-1 day'),
+        ];
+
+        foreach (Plugin::find()->handle($pluginHandle)->each() as $plugin) {
+            /** @var Plugin $plugin */
+            $parsedRepoUrl = $plugin->repository ? parse_url($plugin->repository) : null;
+
+            if (!isset($parsedRepoUrl['host']) || $parsedRepoUrl['host'] !== 'github.com') {
+                $this->stdout("- Skipping $plugin->name (invalid repo URL: $plugin->repository)\n", Console::FG_GREY);
+                continue;
+            }
+
+            [$ghOwner, $ghRepo] = array_pad(explode('/', trim($parsedRepoUrl['path'], '/'), 2), 2, null);
+
+            if (!$ghOwner || !$ghRepo) {
+                $this->stdout("- Skipping $plugin->name (invalid repo URL: $plugin->repository)\n", Console::FG_GREY);
+                continue;
+            }
+
+            try {
+                // Get the GitHub auth token
+                $token = $oathService->getAuthTokenByUserId('Github', $plugin->developerId);
+                if (!$token) {
+                    $this->stdout("- Skipping $plugin->name (no GitHub auth token)\n", Console::FG_GREY);
+                    continue;
+                }
+
+                // Create an authenticated GitHub API client
+                $client = new GithubClient();
+                $client->authenticate($token, null, AuthMethod::ACCESS_TOKEN);
+                $pager = new ResultPager($client);
+
+                // Reference: https://docs.github.com/en/rest/reference/issues#list-repository-issues
+                $allIssues = $pager->fetchAll($client->issues(), 'all', [
+                    $ghOwner, $ghRepo, [
+                        'state' => 'all',
+                        'since' => $periodDates[30]->format(DateTime::ATOM),
+                    ]
+                ]);
+
+                $totals = [
+                    30 => [],
+                    7 => [],
+                    3 => [],
+                    1 => [],
+                ];
+
+                foreach ($allIssues as $issue) {
+                    if (isset($issue['pull_request'])) {
+                        if (!empty($issue['pull_request']['merged_at'])) {
+                            $counter = 'mergedPulls';
+                        } else if ($issue['state'] === 'open') {
+                            $counter = 'openPulls';
+                        } else {
+                            // Not counting closed PRs
+                            continue;
+                        }
+                    } else if ($issue['state'] === 'open') {
+                        $counter = 'openIssues';
+                    } else {
+                        $counter = 'closedIssues';
+                    }
+
+                    $timestamp = DateTimeHelper::toDateTime($issue['updated_at']);
+                    foreach ($periodDates as $period => $periodDate) {
+                        if ($period === 30 || $timestamp > $periodDate) {
+                            if (!isset($totals[$period][$counter])) {
+                                $totals[$period][$counter] = 1;
+                            } else {
+                                $totals[$period][$counter]++;
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                }
+
+                $rows = [];
+                $timestamp = Db::prepareDateForDb(new DateTime());
+
+                foreach ($totals as $period => $periodTotals) {
+                    $rows[] = [
+                        $plugin->id,
+                        $period,
+                        $periodTotals['openIssues'] ?? 0,
+                        $periodTotals['closedIssues'] ?? 0,
+                        $periodTotals['openPulls'] ?? 0,
+                        $periodTotals['mergedPulls'] ?? 0,
+                        $timestamp,
+                    ];
+                }
+
+                Db::batchInsert('craftnet_plugin_issue_stats', [
+                    'pluginId',
+                    'period',
+                    'openIssues',
+                    'closedIssues',
+                    'openPulls',
+                    'mergedPulls',
+                    'dateUpdated',
+                ], $rows, false);
+
+                $this->stdout("- Updated $plugin->name\n", Console::FG_GREEN);
+            } catch (Throwable $e) {
+                $this->stderr("- Error updating $plugin->name: {$e->getMessage()}\n", Console::FG_RED);
+            }
         }
 
         return ExitCode::OK;

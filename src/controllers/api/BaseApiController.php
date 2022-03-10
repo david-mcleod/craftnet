@@ -831,6 +831,16 @@ EOL;
     }
 
     /**
+     * Returns whether plugin issue stats should be included in full plugin details
+     *
+     * @return bool
+     */
+    protected function withIssueStats(): bool
+    {
+        return (bool)$this->request->getQueryParam('withIssueStats');
+    }
+
+    /**
      * @param Plugin $plugin
      * @param bool $fullDetails
      *
@@ -987,6 +997,14 @@ EOL;
             if ($iconContent) {
                 $data['icon'] = $iconContent;
             }
+        }
+
+        if ($this->withIssueStats()) {
+            $data['issueStats'] = (new Query())
+                ->select(['period', 'openIssues', 'closedIssues', 'openPulls', 'mergedPulls'])
+                ->from(['craftnet_plugin_issue_stats'])
+                ->where(['pluginId' => $plugin->id, 'period' => 30])
+                ->all();
         }
 
         return $data;
