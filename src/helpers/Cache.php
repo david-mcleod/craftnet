@@ -61,7 +61,7 @@ abstract class Cache
      */
     public static function invalidate(string|array $tags): void
     {
-        $tags = array_map(fn(string $tag) => static::tag($tag), $tags);
+        $tags = array_map(fn(string $tag) => static::tag($tag), (array)$tags);
         TagDependency::invalidate(Craft::$app->cache, $tags);
     }
 
