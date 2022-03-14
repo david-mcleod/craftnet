@@ -113,6 +113,8 @@ class PaymentsController extends CartsController
             throw new ValidationException($errors);
         }
 
+        $redirect = null;
+
         // only process a payment if there's a price
         if ($totalPrice) {
             // get the gateway
@@ -137,7 +139,7 @@ class PaymentsController extends CartsController
         }
 
         /** @var Transaction $transaction */
-        $response = ['completed' => true];
+        $response = empty($redirect) ? ['completed' => true] : ['redirect' => $redirect];
         if (isset($transaction)) {
             $response['transaction'] = $transaction->toArray();
         }

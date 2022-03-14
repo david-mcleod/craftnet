@@ -117,7 +117,12 @@
                         this.saveBillingInfos()
                             .then(() => {
                                 this.processPayment()
-                                    .then(() => {
+                                    .then((response) => {
+                                        if (response.data.redirect) {
+                                          window.location.href=response.data.redirect;
+                                          return;
+                                        }
+
                                         this.$store.dispatch('app/displayNotice', 'Payment processed.')
                                         this.payLoading = false
                                         this.$router.push({path: '/thank-you'})
