@@ -240,8 +240,9 @@
                 }
 
                 return this.$store.dispatch('cart/checkout', checkoutData)
-                    .then(() => {
+                    .then((response) => {
                         this.$store.dispatch('cart/resetCart')
+                        return response;
                     })
             },
         },
