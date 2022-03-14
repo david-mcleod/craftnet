@@ -246,7 +246,11 @@
 
                 return this.$store.dispatch('cart/checkout', checkoutData)
                     .then((response) => {
-                        this.$store.dispatch('cart/resetCart')
+                        // Reset the cart only if the transaction completed.
+                        if (response.data.completed) {
+                          this.$store.dispatch('cart/resetCart')
+                        }
+
                         return response;
                     })
             },
