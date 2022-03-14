@@ -178,6 +178,10 @@ class CartsController extends BaseApiController
             // update the IP
             $cart->lastIp = $this->request->getUserIP();
 
+            // update cancel/return URLs
+            $cart->cancelUrl = App::parseEnv('$URL_ID') . 'payment';
+            $cart->returnUrl = App::parseEnv('$URL_ID') . 'thank-you';
+
             // Remember the current customerId before determining the possible new one
             $customerId = $cart->customerId;
 
