@@ -187,7 +187,6 @@ class AccountController extends Controller
     public function actionGetFlashMessages(): Response
     {
         $this->requireAcceptsJson();
-        $this->requireLogin();
 
         $session = Craft::$app->getSession();
 
