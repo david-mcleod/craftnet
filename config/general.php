@@ -26,6 +26,7 @@ return [
         'phpSessionName' => 'CraftnetSessionId',
         'generateTransformsBeforePageLoad' => true,
         'activateAccountSuccessPath' => '/login?activated=1',
+        'defaultCookieDomain' => App::env('DEFAULT_COOKIE_DOMAIN') ?: '.craftcms.com',
         'backupOnUpdate' => false,
         'backupCommand' => 'PGPASSWORD="{password}" ' .
             'pg_dump ' .
@@ -53,23 +54,19 @@ return [
         'testToEmailAddress' => App::env('TEST_EMAIL') ?: null
     ],
     'prod' => [
-        'defaultCookieDomain' => '.craftcms.com',
         'runQueueAutomatically' => false,
-    ],
-    'stage' => [
-        'defaultCookieDomain' => '.craftcms.com',
     ],
     'dev' => [
         'devMode' => true,
         'useCompressedJs' => false,
         'allowUpdates' => true,
-        'defaultCookieDomain' => '.craftcms.test',
+        'defaultCookieDomain' => App::env('DEFAULT_COOKIE_DOMAIN') ?: '.craftcms.test',
         'enableBasicHttpAuth' => true,
     ],
     'next' => [
         'devMode' => true,
         'useCompressedJs' => false,
         'allowUpdates' => true,
-        'defaultCookieDomain' => '.craftcms.next',
+        'defaultCookieDomain' => App::env('DEFAULT_COOKIE_DOMAIN') ?: '.craftcms.next',
     ]
 ];
