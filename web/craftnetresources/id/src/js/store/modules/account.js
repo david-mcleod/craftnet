@@ -170,7 +170,7 @@ const actions = {
         })
     },
 
-    getFlashMessages({commit}) {
+    getFlashMessages() {
         return new Promise((resolve, reject) => {
             accountApi.getFlashMessages()
                 .then((response) => {
