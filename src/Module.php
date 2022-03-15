@@ -54,6 +54,7 @@ use craftnet\cms\CmsLicenseManager;
 use craftnet\composer\JsonDumper;
 use craftnet\composer\PackageManager;
 use craftnet\fields\Plugins;
+use craftnet\helpers\Cache;
 use craftnet\invoices\InvoiceManager;
 use craftnet\orders\PdfRenderer;
 use craftnet\payouts\PayoutManager;
@@ -384,7 +385,15 @@ class Module extends \yii\base\Module
 
         Event::on(ClearCaches::class, ClearCaches::EVENT_REGISTER_TAG_OPTIONS, function(RegisterCacheOptionsEvent $event) {
             $event->options[] = [
-                'tag' => 'pluginIcon',
+                'tag' => Cache::tag(Cache::TAG_PACKAGES),
+                'label' => Craft::t('app', 'Packages'),
+            ];
+            $event->options[] = [
+                'tag' => Cache::tag(Cache::TAG_PLUGIN_CHANGELOGS),
+                'label' => Craft::t('app', 'Plugin changelogs'),
+            ];
+            $event->options[] = [
+                'tag' => Cache::tag(Cache::TAG_PLUGIN_ICONS),
                 'label' => Craft::t('app', 'Plugin icons'),
             ];
         });

@@ -41,9 +41,9 @@ abstract class PluginPurchasable extends Purchasable
     /**
      * @inheritdoc
      */
-    public function rules()
+    protected function defineRules(): array
     {
-        $rules = parent::rules();
+        $rules = parent::defineRules();
         $rules[] = [['pluginId'], 'required'];
         $rules[] = [['pluginId'], 'number', 'integerOnly' => true];
         return $rules;

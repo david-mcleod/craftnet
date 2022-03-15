@@ -46,7 +46,7 @@ class CmsLicense extends License
      */
     public $allowCustomDomain = false;
 
-    public function rules()
+    protected function defineRules(): array
     {
         return [
             [['expirable', 'expired', 'editionHandle', 'email', 'key'], 'required'],

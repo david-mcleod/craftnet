@@ -53,13 +53,13 @@ class PluginController extends BaseApiController
      */
     public function actionChangelog($pluginId): Response
     {
-        $cacheKey = __METHOD__ . '-' . $pluginId;
+        $cacheKey = sprintf('%s-%s-v%s', __METHOD__, $pluginId, $this->cmsMajorVersion());
         $changelogData = Cache::get($cacheKey);
 
         if (!$changelogData) {
             $plugin = Plugin::find()
                 ->id($pluginId)
-                ->withLatestReleaseInfo()
+                ->withLatestReleaseInfo(cmsVersion: $this->cmsVersionForPluginQueries())
                 ->one();
 
             if (!$plugin) {
@@ -74,8 +74,13 @@ class PluginController extends BaseApiController
                 $date = DateTimeHelper::toDateTime($release['date']);
                 $release['date'] = $date ? $date->format('Y-m-d\TH:i:s') : null;
             }
+
             $changelogData = array_values($releases);
-            Cache::set($cacheKey, $changelogData);
+
+            Cache::set($cacheKey, $changelogData, [
+                Cache::TAG_PACKAGES,
+                Cache::TAG_PLUGIN_CHANGELOGS,
+            ]);
         }
 
         return $this->asJson($changelogData);

@@ -1001,8 +1001,8 @@ EOL;
                     $iconContent = Html::namespaceAttributes($iconContent, StringHelper::randomString(10), true);
 
                     Cache::set($cacheKey, $iconContent, [
-                        'pluginIcon',
-                        sprintf('element::%s::%s', Plugin::class, $plugin->id),
+                        Cache::TAG_PLUGIN_ICONS,
+                        Cache::pluginIconTag($plugin),
                     ]);
                 }
             }
@@ -1245,12 +1245,23 @@ EOL;
             if ($cmsConstraint = $this->request->getQueryParam('cmsConstraint')) {
                 $cmsVersion = $this->module->getPackageManager()
                         ->getLatestVersion('craftcms/cms', null, $cmsConstraint) ?? '0.0';
-            } else {
+            } else if ($this->cmsVersion) {
                 $cmsVersion = $this->cmsVersion;
             }
             $this->_cmsVersionForPluginQueries = $cmsVersion ?? false;
         }
 
         return $this->_cmsVersionForPluginQueries ?: null;
+    }
+
+    /**
+     * Returns the major Craft version that this request is for.
+     *
+     * @return int
+     */
+    protected function cmsMajorVersion(): int
+    {
+        $cmsVersion = $this->cmsVersionForPluginQueries();
+        return (int)($cmsVersion ?? 3);
     }
 }

@@ -248,9 +248,9 @@ class PluginEdition extends PluginPurchasable implements EditionInterface
         }
     }
 
-    public function rules()
+    protected function defineRules(): array
     {
-        $rules = parent::rules();
+        $rules = parent::defineRules();
         $rules[] = [['name', 'handle'], 'required'];
         $rules[] = [['price', 'renewalPrice'], 'normalizePrice', 'skipOnEmpty' => false];
 
