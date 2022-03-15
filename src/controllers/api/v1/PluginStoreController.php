@@ -81,7 +81,7 @@ class PluginStoreController extends BaseApiController
                 'expiryDateOptions' => $this->_expiryDateOptions(),
             ];
 
-            Cache::set($cacheKey, $pluginStoreData);
+            $this->_cache($cacheKey, $pluginStoreData);
         }
 
         return $this->asJson($pluginStoreData);
@@ -124,7 +124,7 @@ class PluginStoreController extends BaseApiController
                 ->one();
 
             $data = $this->_transformFeaturedSection($featuredSectionEntry);
-            Cache::set($cacheKey, $data);
+            $this->_cache($cacheKey, $data);
         }
 
         return $this->asJson($data);
@@ -158,7 +158,7 @@ class PluginStoreController extends BaseApiController
                 }
             }
 
-            Cache::set($cacheKey, $data);
+            $this->_cache($cacheKey, $data);
         }
 
         return $this->asJson($data);
@@ -185,7 +185,7 @@ class PluginStoreController extends BaseApiController
             }
 
             $data = $this->transformPlugin($plugin, true);
-            Cache::set($cacheKey, $data);
+            $this->_cache($cacheKey, $data);
         }
 
         // Add the latest compatible version
@@ -337,7 +337,7 @@ class PluginStoreController extends BaseApiController
                 'total' => $totalPages,
             ];
 
-            Cache::set($cacheKey, $data);
+            $this->_cache($cacheKey, $data);
         }
 
         return $this->asJson($data);
@@ -379,7 +379,7 @@ class PluginStoreController extends BaseApiController
                 'totalResults' => count($plugins),
             ];
 
-            Cache::set($cacheKey, $data);
+            $this->_cache($cacheKey, $data);
         }
 
         return $this->asJson($data);
@@ -407,7 +407,7 @@ class PluginStoreController extends BaseApiController
                 ->all();
 
             $data = $this->transformPlugins($plugins);
-            Cache::set($cacheKey, $data);
+            $this->_cache($cacheKey, $data);
         }
 
         return $this->asJson($data);
@@ -466,7 +466,7 @@ class PluginStoreController extends BaseApiController
                 ];
             }
 
-            Cache::set($cacheKey, $data);
+            $this->_cache($cacheKey, $data);
         }
 
         return $data;
@@ -568,14 +568,36 @@ class PluginStoreController extends BaseApiController
      */
     private function _cacheKey(?string ...$components): string
     {
-        if ($cmsVersion = $this->cmsVersionForPluginQueries()) {
-            $components[] = $cmsVersion;
-        }
+        $components[] = sprintf('v%s', $this->cmsMajorVersion());
 
         if ($this->withPluginIcons()) {
             $components[] = 'withIcons';
         }
 
         return implode('-', $components);
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     */
+    private function _cache(string $key, mixed $value): void
+    {
+        Cache::set($key, $value, $this->_cacheTags());
+    }
+
+    /**
+     * @param array string|null ...$tags
+     * @return array
+     */
+    private function _cacheTags(?string ...$tags): array
+    {
+        $tags[] = Cache::TAG_PACKAGES;
+
+        if ($this->withPluginIcons()) {
+            $tags[] = Cache::TAG_PLUGIN_ICONS;
+        }
+
+        return $tags;
     }
 }

@@ -56,9 +56,9 @@ class PluginRenewal extends PluginPurchasable implements RenewalInterface
     /**
      * @inheritdoc
      */
-    public function rules()
+    protected function defineRules(): array
     {
-        $rules = parent::rules();
+        $rules = parent::defineRules();
         $rules[] = [['editionId', 'price'], 'required'];
         $rules[] = [['editionId'], 'number', 'integerOnly' => true];
         $rules[] = [['price'], 'number'];

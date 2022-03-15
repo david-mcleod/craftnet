@@ -126,9 +126,9 @@ class CmsEdition extends CmsPurchasable implements EditionInterface
     /**
      * @inheritdoc
      */
-    public function rules()
+    protected function defineRules(): array
     {
-        $rules = parent::rules();
+        $rules = parent::defineRules();
         $rules[] = [['name', 'handle', 'price', 'renewalPrice'], 'required'];
         $rules[] = [['price', 'renewalPrice'], 'number'];
         return $rules;

@@ -768,9 +768,9 @@ class Plugin extends Element
         return $this->_history = new PluginHistory($this);
     }
 
-    public function rules()
+    protected function defineRules(): array
     {
-        $rules = parent::rules();
+        $rules = parent::defineRules();
 
         $rules[] = [
             [

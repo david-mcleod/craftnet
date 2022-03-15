@@ -46,7 +46,7 @@ class PluginLicense extends License
     /**
      * @inheritdoc
      */
-    public function rules()
+    protected function defineRules(): array
     {
         return [
             [['trial', 'expirable', 'expired', 'plugin', 'email', 'key'], 'required'],

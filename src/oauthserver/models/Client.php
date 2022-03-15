@@ -63,7 +63,7 @@ class Client extends Model
     /**
      * @inheritdoc
      */
-    public function rules()
+    protected function defineRules(): array
     {
         return [
             [['name', 'identifier'], 'required'],
