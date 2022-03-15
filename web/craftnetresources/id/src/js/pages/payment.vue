@@ -119,8 +119,8 @@
                                 this.processPayment()
                                     .then((response) => {
                                         if (response.data.redirect) {
-                                          window.location.href=response.data.redirect;
-                                          return;
+                                            window.location.href=response.data.redirect;
+                                            return;
                                         }
 
                                         this.$store.dispatch('app/displayNotice', 'Payment processed.')

@@ -1,3 +1,5 @@
+/* global Craft */
+
 import axios from 'axios'
 
 export default {
@@ -12,7 +14,10 @@ export default {
     axios() {
         if(!this._axios) {
             this._axios = axios.create({
-                baseURL: process.env.VUE_APP_CRAFT_API_ENDPOINT + '/',
+                headers: {
+                    'X-CSRF-Token':  Craft.csrfTokenValue
+                },
+                baseURL: process.env.VUE_APP_CRAFT_ID_ENDPOINT + '/',
                 // params: {XDEBUG_SESSION_START: 16433}
             })
         }
