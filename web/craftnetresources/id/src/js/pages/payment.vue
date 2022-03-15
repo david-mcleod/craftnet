@@ -106,6 +106,7 @@
             ...mapActions({
                 getCart: 'cart/getCart',
                 getStripeAccount: 'stripe/getStripeAccount',
+                getFlashMessages: 'account/getFlashMessages'
             }),
 
             pay() {
@@ -280,6 +281,16 @@
             if (this.card) {
                 this.paymentMode = 'existingCard'
             }
+
+            this.getFlashMessages()
+                .then((response) => {
+                    if (response.data.error) {
+                      this.$store.dispatch('app/displayError', response.data.error);
+                    }
+                    if (response.data.notice) {
+                      this.$store.dispatch('app/displayNotice', response.data.notice);
+                    }
+                })
 
             this.$nextTick(() => {
                 if(this.accountBillingAddress) {

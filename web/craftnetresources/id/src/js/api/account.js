@@ -49,5 +49,13 @@ export default {
                 'X-CSRF-Token': Craft.csrfTokenValue,
             }
         })
+    },
+
+    getFlashMessages() {
+        return axios.post(Craft.actionUrl + '/craftnet/id/account/get-flash-messages', {}, {
+            headers: {
+                'X-CSRF-Token': Craft.csrfTokenValue,
+            }
+        });
     }
 }

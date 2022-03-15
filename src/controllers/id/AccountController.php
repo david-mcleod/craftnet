@@ -178,6 +178,26 @@ class AccountController extends Controller
     }
 
     /**
+     * Get the flash messages
+     *
+     * @return Response
+     * @throws BadRequestHttpException
+     * @throws ForbiddenHttpException
+     */
+    public function actionGetFlashMessages(): Response
+    {
+        $this->requireAcceptsJson();
+        $this->requireLogin();
+
+        $session = Craft::$app->getSession();
+
+        return $this->asJson([
+            'notice' => $session->getFlash('notice', null, true),
+            'error' => $session->getFlash('error', null, true)
+        ]);
+    }
+
+    /**
      * Save billing info.
      *
      * @return Response

@@ -169,6 +169,18 @@ const actions = {
             }
         })
     },
+
+    getFlashMessages({commit}) {
+        return new Promise((resolve, reject) => {
+            accountApi.getFlashMessages()
+                .then((response) => {
+                    resolve(response)
+                })
+                .catch((response) => {
+                    reject(response)
+                })
+        })
+    },
 }
 
 /**
