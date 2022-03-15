@@ -63,7 +63,7 @@ return [
         'devMode' => true,
         'useCompressedJs' => false,
         'allowUpdates' => true,
-        'defaultCookieDomain' => '.craftcms.nitro',
+        'defaultCookieDomain' => '.craftcms.test',
         'enableBasicHttpAuth' => true,
     ],
     'next' => [
