@@ -138,8 +138,16 @@ class PaymentsController extends CartsController
             $cart->markAsComplete();
         }
 
+        if (empty($redirect)) {
+            $response = ['completed' => true];
+        } else {
+            if (CRAFT_SITE === 'craftId') {
+                $response = ['redirect' => $redirect];
+            } else {
+                throw new BadRequestHttpException('Cards that require 3DS authentication cannot be processed in the in-app Plugin Store');
+            }
+        }
         /** @var Transaction $transaction */
-        $response = empty($redirect) ? ['completed' => true] : ['redirect' => $redirect];
         if (isset($transaction)) {
             $response['transaction'] = $transaction->toArray();
         }
