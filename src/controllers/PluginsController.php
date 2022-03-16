@@ -294,6 +294,7 @@ JS;
         if ($isCpRequest || $newPlugin) {
             $pluginHandle = $this->request->getBodyParam('handle');
             if ($pluginHandle && $pluginHandle != $plugin->handle) {
+                $plugin->handle = $pluginHandle;
                 $newHandle = true;
             }
 
