@@ -144,7 +144,7 @@ class PaymentsController extends CartsController
             if (CRAFT_SITE === 'craftId') {
                 $response = ['redirect' => $redirect];
             } else {
-                throw new BadRequestHttpException('Cards that require 3DS authentication cannot be processed in the in-app Plugin Store');
+                throw new BadRequestHttpException('Cards that require strong customer authentication cannot be processed from the in-app Plugin Store. Please update to Craft CMS 3.7.37 or later, and try again.');
             }
         }
         /** @var Transaction $transaction */
