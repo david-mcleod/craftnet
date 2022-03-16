@@ -286,25 +286,25 @@ JS;
 
         $pluginName = $this->request->getBodyParam('name');
 
-        if ($pluginName && $pluginName != $plugin->name) {
+        if ($pluginName && (!$plugin->name || $pluginName != $plugin->name)) {
             $plugin->name = $pluginName;
             $newName = true;
         }
 
         if ($isCpRequest || $newPlugin) {
             $pluginHandle = $this->request->getBodyParam('handle');
-            if ($pluginHandle && $pluginHandle != $plugin->handle) {
+            if ($pluginHandle && (!$plugin->handle || $pluginHandle != $plugin->handle)) {
                 $plugin->handle = $pluginHandle;
                 $newHandle = true;
             }
 
             $packageName = $this->request->getBodyParam('packageName');
-            if ($packageName && $packageName != $plugin->packageName) {
+            if ($packageName && (!$plugin->packageName || $packageName != $plugin->packageName)) {
                 $plugin->packageName = $packageName;
             }
 
             $repository = $this->request->getBodyParam('repository');
-            if ($repository && $repository != $plugin->repository) {
+            if ($repository && (!$plugin->repository || $repository != $plugin->repository)) {
                 $plugin->repository = $repository;
             }
         }
@@ -322,7 +322,7 @@ JS;
 
         if ($isCpRequest) {
             $iconId = $this->request->getBodyParam('iconId')[0] ?? null;
-            if ($iconId && $iconId != $plugin->iconId) {
+            if ($iconId && (!$plugin->iconId || $iconId != $plugin->iconId)) {
                 $plugin->iconId = $iconId;
                 $newIcon = true;
             }
