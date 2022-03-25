@@ -5,8 +5,10 @@ namespace craftnet;
 use Craft;
 use craft\awss3\Volume as S3Volume;
 use craft\commerce\elements\Order;
+use craft\commerce\events\MatchLineItemEvent;
 use craft\commerce\events\PdfEvent;
 use craft\commerce\models\Discount;
+use craft\commerce\services\Discounts;
 use craft\commerce\services\OrderAdjustments;
 use craft\commerce\services\Pdfs;
 use craft\commerce\services\Purchasables;
@@ -53,6 +55,7 @@ use craftnet\cms\CmsEdition;
 use craftnet\cms\CmsLicenseManager;
 use craftnet\composer\JsonDumper;
 use craftnet\composer\PackageManager;
+use craftnet\db\Table;
 use craftnet\fields\Plugins;
 use craftnet\helpers\Cache;
 use craftnet\invoices\InvoiceManager;
@@ -68,6 +71,7 @@ use craftnet\utilities\SalesReport;
 use craftnet\utilities\UnavailablePlugins;
 use yii\base\ActionEvent;
 use yii\base\Event;
+use yii\db\Query;
 use yii\web\ForbiddenHttpException;
 
 /**
@@ -181,6 +185,40 @@ class Module extends \yii\base\Module
         Event::on(Users::class, Users::EVENT_AFTER_ACTIVATE_USER, function(UserEvent $e) {
             $this->getCmsLicenseManager()->claimLicenses($e->user);
             $this->getPluginLicenseManager()->claimLicenses($e->user);
+        });
+
+        Event::on(Discounts::class, Discounts::EVENT_DISCOUNT_MATCHES_LINE_ITEM, function(MatchLineItemEvent $e) {
+            if ($e->discount->code == 'FREEFORM') {
+
+                $sku = $e->lineItem->getSku();
+
+                // Is this Freeform Pro?
+                if ($sku == 'FREEFORM-PRO' || $sku == 'COMMERCE-PRO') {
+                    $options = $e->lineItem->getOptions();
+                    if (isset($options['licenseKey'])) {
+                        // Grab the existing Freeform license key
+                        $key = $options['licenseKey'];
+                        $license = $this->getPluginLicenseManager()->getLicenseByKey($key);
+
+                        // See if this license has an existing lineItem associated with it
+                        $lineItemId = (new Query())
+                            ->select('lineItemId')
+                            ->from(Table::PLUGINLICENSES_LINEITEMS)
+                            ->where(['licenseId' => $license->id])
+                            ->scalar();
+
+                        if ($lineItemId) {
+                            $lineItem = \craft\commerce\Plugin::getInstance()->getLineItems()->getLineItemById($lineItemId);
+
+                            // See if the existing lineItem already had this discount applied
+                            if ($lineItem && $lineItem->getOrder()->couponCode == 'FREEFORM') {
+                                // Can't use it again.
+                                $e->isValid = false;
+                            }
+                        }
+                    }
+                }
+            }
         });
 
         // provide custom order receipt PDF generation
