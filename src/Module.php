@@ -193,7 +193,7 @@ class Module extends \yii\base\Module
                 $sku = $e->lineItem->getSku();
 
                 // Is this Freeform Pro?
-                if ($sku == 'FREEFORM-PRO' || $sku == 'COMMERCE-PRO') {
+                if ($sku == 'FREEFORM-PRO') {
                     $options = $e->lineItem->getOptions();
                     if (isset($options['licenseKey'])) {
                         // Grab the existing Freeform license key
