@@ -602,7 +602,7 @@ class CmsLicenseManager extends Component
 
                     if (!$expiryDateStart) {
                         $expiryDateStart = $pluginLicense['expiresOn'];
-                    } else {
+                    } elseif($pluginLicense['expiresOn']) {
                         $expiryDateStart = min($expiryDateStart, $pluginLicense['expiresOn']);
                     }
                 }
