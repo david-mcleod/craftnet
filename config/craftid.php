@@ -47,7 +47,7 @@ return [
         'craftIdUrl' => 'https://staging-1750ml.id.craftcms.com/',
     ],
     'dev' => [
-        'craftIdUrl' => 'https://id.craftcms.test',
+        'craftIdUrl' => App::env('URL_ID'),
     ],
     'next' => [
         'craftIdUrl' => 'https://id.craftcms.next',
