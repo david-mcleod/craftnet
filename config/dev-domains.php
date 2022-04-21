@@ -48,6 +48,7 @@ return [
     'frb.io',
     'friendlytest.net',
     'front.app',
+    'funbit.dev',
     'fusionarydev.com',
     'fusiondgdev.com',
     'gbdev.co',
