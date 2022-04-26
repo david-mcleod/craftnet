@@ -32,6 +32,7 @@ use craft\events\RegisterUserPermissionsEvent;
 use craft\events\UserEvent;
 use craft\fieldlayoutelements\StandardTextField;
 use craft\helpers\App;
+use craft\helpers\StringHelper;
 use craft\models\FieldLayout;
 use craft\models\SystemMessage;
 use craft\services\Elements;
@@ -195,7 +196,8 @@ class Module extends \yii\base\Module
                 // Is this Freeform Pro?
                 if ($sku == 'FREEFORM-PRO') {
                     $options = $e->lineItem->getOptions();
-                    if (isset($options['licenseKey'])) {
+                    // If this is a new license, ignore it.
+                    if (isset($options['licenseKey']) && !StringHelper::startsWith($options['licenseKey'], 'new:')) {
                         // Grab the existing Freeform license key
                         $key = $options['licenseKey'];
                         $license = $this->getPluginLicenseManager()->getLicenseByKey($key);
