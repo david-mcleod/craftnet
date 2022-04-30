@@ -55,6 +55,7 @@ return [
         'GET     v1/plugins' => 'craftnet/api/v1/plugins',
         'GET     v1/package/<packageName:[\w\-]+/[\w\-]+>' => 'craftnet/api/v1/package/get',
         'POST    v1/support' => 'craftnet/api/v1/support/create',
+        'GET     v1/upgrade-info' => 'craftnet/api/v1/upgrade-info',
         'GET     v1/updates' => 'craftnet/api/v1/updates',
         'POST    v1/updates' => 'craftnet/api/v1/updates/old',
         'POST    v1/utils/releases-2-changelog' => 'craftnet/api/v1/utils/releases-2-changelog',

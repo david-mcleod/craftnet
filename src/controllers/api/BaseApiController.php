@@ -6,6 +6,7 @@ use Composer\Semver\Comparator;
 use Composer\Semver\Semver;
 use Craft;
 use craft\db\Query;
+use craft\elements\Asset;
 use craft\elements\User;
 use craft\errors\InvalidPluginException;
 use craft\helpers\App;
@@ -979,34 +980,8 @@ EOL;
             $data['installHistory'] = array_reverse($installHistory);
         }
 
-        if ($this->withPluginIcons()) {
-            $cacheKey = "pluginIcon:$plugin->id";
-            $iconContent = Cache::get($cacheKey);
-
-            if (!$iconContent) {
-                try {
-                    $iconContent = $icon->getContents();
-                } catch (\Throwable $e) {
-                    Craft::warning("Could not fetch the plugin icon for $plugin->handle: {$e->getMessage()}", __METHOD__);
-                    Craft::$app->getErrorHandler()->logException($e);
-                    $iconContent = null;
-                }
-
-                if ($iconContent) {
-                    // Sanitize
-                    $iconContent = Html::sanitizeSvg($iconContent);
-                    // Remove the XML declaration
-                    $iconContent = preg_replace('/<\?xml.*?\?>\s*/', '', $iconContent);
-                    // Namespace class names and IDs
-                    $iconContent = Html::namespaceAttributes($iconContent, StringHelper::randomString(10), true);
-
-                    Cache::set($cacheKey, $iconContent, [
-                        Cache::TAG_PLUGIN_ICONS,
-                        Cache::pluginIconTag($plugin),
-                    ]);
-                }
-            }
-
+        if ($icon && $this->withPluginIcons()) {
+            $iconContent = $this->pluginIconContents($plugin, $icon);
             if ($iconContent) {
                 $data['icon'] = $iconContent;
             }
@@ -1021,6 +996,47 @@ EOL;
         }
 
         return $data;
+    }
+
+    protected function pluginIconContents(Plugin $plugin, ?Asset $icon = null): ?string
+    {
+        $icon = $icon ?? $plugin->getIcon();
+
+        if (!$icon) {
+            return null;
+        }
+
+        $cacheKey = "pluginIcon:$plugin->id";
+        $iconContent = Cache::get($cacheKey);
+
+        if ($iconContent) {
+            return $iconContent;
+        }
+
+        try {
+            $iconContent = $icon->getContents();
+        } catch (\Throwable $e) {
+            Craft::warning("Could not fetch the plugin icon for $plugin->handle: {$e->getMessage()}", __METHOD__);
+            Craft::$app->getErrorHandler()->logException($e);
+        }
+
+        if (!$iconContent) {
+            return null;
+        }
+
+        // Sanitize
+        $iconContent = Html::sanitizeSvg($iconContent);
+        // Remove the XML declaration
+        $iconContent = preg_replace('/<\?xml.*?\?>\s*/', '', $iconContent);
+        // Namespace class names and IDs
+        $iconContent = Html::namespaceAttributes($iconContent, StringHelper::randomString(10), true);
+
+        Cache::set($cacheKey, $iconContent, [
+            Cache::TAG_PLUGIN_ICONS,
+            Cache::pluginIconTag($plugin),
+        ]);
+
+        return $iconContent;
     }
 
     /**

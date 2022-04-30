@@ -165,6 +165,17 @@ class Plugin extends Element
                     ->orderBy(['ps.sortOrder' => SORT_ASC]);
                 return ['elementType' => Asset::class, 'map' => $query->all()];
 
+            case 'replacement':
+                $query = (new Query())
+                    ->select([
+                        'source' => 'id',
+                        'target' => 'replacementId',
+                    ])
+                    ->from([Table::PLUGINS])
+                    ->where(['id' => ArrayHelper::getColumn($sourceElements, 'id')])
+                    ->andWhere(['not', ['replacementId' => null]]);
+                return ['elementType' => Plugin::class, 'map' => $query->all()];
+
             default:
                 return parent::eagerLoadingMap($sourceElements, $handle);
         }
@@ -427,6 +438,11 @@ class Plugin extends Element
     private $_screenshots;
 
     /**
+     * @var Plugin|null
+     */
+    private $_replacement;
+
+    /**
      * @var bool Whether the plugin was just submitted for approval
      */
     private $_submittedForApproval = false;
@@ -517,6 +533,9 @@ class Plugin extends Element
                 break;
             case 'screenshots':
                 $this->setScreenshots($elements);
+                break;
+            case 'replacement':
+                $this->_replacement = $elements[0] ?? null;
                 break;
             default:
                 parent::setEagerLoadedElements($handle, $elements);
@@ -1179,7 +1198,12 @@ EOD;
         if ($this->replacementId === null) {
             return null;
         }
-        return Plugin::findOne($this->replacementId);
+
+        if (!isset($this->_replacement)) {
+            $this->_replacement = Plugin::findOne($this->replacementId);
+        }
+
+        return $this->_replacement;
     }
 
     /**

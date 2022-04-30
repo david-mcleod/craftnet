@@ -269,8 +269,7 @@ class PackageManager extends Component
         ?string $minStability = 'stable',
         ?string $constraint = null,
         bool $sort = true
-    ): array
-    {
+    ): array {
         $vp = new VersionParser();
         $from = $vp->normalize($from);
         $to = $vp->normalize($to);
@@ -411,16 +410,24 @@ class PackageManager extends Component
     }
 
     /**
-     * @param int $versionId The package version ID
-     * @return string|null
+     * @param int|array $versionId The package version ID(s)
+     * @return string|array|null
      */
-    public function getPhpConstraintByVersionId(int $versionId): ?string
+    public function getPhpConstraintByVersionId(int|array $versionId): string|array|null
     {
-        return (new Query())
-            ->select(['constraints'])
+        $query = (new Query())
             ->from([Table::PACKAGEDEPS])
-            ->where(['versionId' => $versionId, 'name' => 'php'])
-            ->scalar() ?: null;
+            ->where(['versionId' => $versionId, 'name' => 'php']);
+
+        if (is_int($versionId)) {
+            return $query
+                ->select(['constraints'])
+                ->scalar() ?: null;
+        }
+
+        return $query
+            ->select(['versionId', 'constraints'])
+            ->pairs();
     }
 
     /**
