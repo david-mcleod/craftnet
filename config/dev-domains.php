@@ -82,6 +82,7 @@ return [
     'marbles.dev',
     'martinleveille.dev',
     'mcipreview.com',
+    'mdev.onl',
     'microserve-staging.ca',
     'miranj.dev',
     'mldev.net',
