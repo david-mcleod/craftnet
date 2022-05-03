@@ -527,7 +527,8 @@ abstract class BaseApiController extends Controller
                         ($pluginHandle === 'sprout-seo' && Comparator::lessThan($this->pluginVersions[$pluginHandle], '4.1')) ||
                         ($pluginHandle === 'guide' && Comparator::lessThan($this->pluginVersions[$pluginHandle], 2)) ||
                         ($pluginHandle === 'calendar' && Comparator::lessThan($this->pluginVersions[$pluginHandle], 3)) ||
-                        ($pluginHandle === 'sherlock' && Comparator::lessThan($this->pluginVersions[$pluginHandle], 3))
+                        ($pluginHandle === 'sherlock' && Comparator::lessThan($this->pluginVersions[$pluginHandle], 3)) ||
+                        ($pluginHandle === 'enupal-stripe' && Comparator::lessThan($this->pluginVersions[$pluginHandle], 4))
                     ) {
                         $pluginLicenseEditions[] = "{$pluginHandle}:standard";
                     } else {
