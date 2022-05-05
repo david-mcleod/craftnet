@@ -104,7 +104,11 @@ class UpdatesController extends BaseApiController
      */
     private function _getCmsUpdateInfo(bool $includePackageName, string $maxVersion = null): array
     {
-        $constraints = [];
+        $constraints = [
+            // Don't ever allow auto-updating to the next major Craft version
+            sprintf('^%s', $this->cmsVersion)
+        ];
+
         $breakpoint = false;
 
         if ($maxVersion) {
