@@ -71,6 +71,11 @@ class FrontController extends BaseApiController
     {
         $payload = $this->getPayload('front-create-ticket');
         $email = $payload->conversation->recipient->handle;
+
+        if ($email == 'dungthuy250418@gmail.com') {
+            return '';
+        }
+
         $conversationId = $payload->conversation->id;
         $email = mb_strtolower($email);
         $plan = Front::plan($email);
