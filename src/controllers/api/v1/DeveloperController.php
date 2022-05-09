@@ -5,6 +5,7 @@ namespace craftnet\controllers\api\v1;
 use craft\elements\User;
 use craftnet\behaviors\UserBehavior;
 use craftnet\controllers\api\BaseApiController;
+use craftnet\partners\Partner;
 use yii\web\Response;
 
 /**
@@ -29,7 +30,7 @@ class DeveloperController extends BaseApiController
             return $this->asErrorJson("Couldn’t find developer");
         }
 
-        return $this->asJson([
+        $data = [
             'developerName' => strip_tags($user->getDeveloperName()),
             'developerUrl' => $user->developerUrl,
             'location' => $user->location,
@@ -37,6 +38,23 @@ class DeveloperController extends BaseApiController
             'fullName' => strip_tags($user->getFullName()),
             'email' => $user->email,
             'photoUrl' => ($user->getPhoto() ? $user->getPhoto()->getUrl(['width' => 200, 'height' => 200, 'mode' => 'fit']) : null),
-        ]);
+        ];
+
+        // Are they a partner?
+        $partner = Partner::find()
+            ->ownerId($user->id)
+            ->status(null)
+            ->one();
+
+        if ($partner) {
+            $data['partnerInfo'] = [
+                'profileUrl' => "https://craftcms.com/partners/$partner->websiteSlug",
+                'isCraftVerified' => $partner->isCraftVerified,
+                'isCommerceVerified' => $partner->isCommerceVerified,
+                'isEnterpriseVerified' => $partner->isEnterpriseVerified,
+            ];
+        }
+
+        return $this->asJson($data);
     }
 }
