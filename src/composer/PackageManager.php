@@ -1063,12 +1063,18 @@ class PackageManager extends Component
             throw $exception;
         }
 
-        // Did we just update the latest version of the package, for its stability level?
+        // Process the changelog for the latest version we just updated
         if ($latestNewRelease) {
             $latestNewVersion = $latestNewRelease->getNormalizedVersion();
+            $this->processPackageChangelog($name, $latestNewVersion);
+
+            // If we didn't just update the package's latest version w/ the same stability level,
+            // reprocess the latest version's changelog
             $stability = VersionParser::parseStability($latestNewVersion);
-            if ($latestNewVersion === $vp->normalize($this->getLatestVersion($name, $stability))) {
-                $this->processPackageChangelog($name, $latestNewVersion);
+            $realLatestVersion = $this->getLatestVersion($name, $stability);
+
+            if ($latestNewVersion !== $vp->normalize($realLatestVersion)) {
+                $this->processPackageChangelog($name, $realLatestVersion);
             }
         }
 
