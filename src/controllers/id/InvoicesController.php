@@ -123,6 +123,11 @@ class InvoicesController extends Controller
             ];
         }
 
+        // Sort invoices in descending order by date
+        usort($data['invoices'], function($a, $b) {
+            return strtotime($b["date"]) - strtotime($a["date"]);
+        });
+
         return $this->asJson($data);
     }
 
@@ -159,7 +164,6 @@ class InvoicesController extends Controller
 
             if (isset($json['invoice_pdf']) && $json['invoice_pdf']) {
                 return $this->redirect($json['invoice_pdf']);
-
             }
 
             throw new \Exception('Could not find an invoice.');
