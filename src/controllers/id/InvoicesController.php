@@ -133,13 +133,14 @@ class InvoicesController extends Controller
      */
     public function actionDownloadSubscriptionInvoice(): Response
     {
+        //$this->requireLogin();
         $id = $this->request->getRequiredParam('id');
 
         try {
-            $headers = [
+            $headers = ['headers' =>  [
                 'Authorization' => 'Bearer ' . App::env('STRIPE_API_KEY'),
                 'Accept'        => 'application/json',
-            ];
+            ]];
 
             $client = Craft::createGuzzleClient();
 
