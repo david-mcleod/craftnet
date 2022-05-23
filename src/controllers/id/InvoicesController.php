@@ -7,7 +7,6 @@ use craft\commerce\Plugin as Commerce;
 use craft\commerce\stripe\Plugin as StripePlugin;
 use craft\helpers\App;
 use craft\helpers\DateTimeHelper;
-use craft\helpers\Json;
 use craft\web\Controller;
 use craftnet\Module;
 use Throwable;
@@ -134,6 +133,7 @@ class InvoicesController extends Controller
      */
     public function actionDownloadSubscriptionInvoice(): Response
     {
+        //$this->requireLogin();
         $id = $this->request->getRequiredParam('id');
 
         try {
@@ -155,14 +155,15 @@ class InvoicesController extends Controller
             }
 
             $contents = $body->getContents();
-            $json = Json::decode($contents);
+            $json = json_decode($contents, true);
 
-            if (isset($json['invoice_pdf']) && $json['invoice_pdf']) {
-                return $this->redirect($json['invoice_pdf']);
+            $invoiceUrl = $json->invoice_pdf;
 
+            if (!$invoiceUrl) {
+                throw new \Exception('Could not find an invoice.');
             }
 
-            throw new \Exception('Could not find an invoice.');
+            return $this->redirect($invoiceUrl);
         } catch (Throwable $e) {
             return $this->asErrorJson($e->getMessage());
         }
