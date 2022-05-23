@@ -5,6 +5,7 @@ namespace craftnet\controllers\id;
 use Craft;
 use craft\commerce\Plugin as Commerce;
 use craft\commerce\stripe\Plugin as StripePlugin;
+use craft\helpers\App;
 use craft\helpers\DateTimeHelper;
 use craft\web\Controller;
 use craftnet\Module;
@@ -117,9 +118,53 @@ class InvoicesController extends Controller
                 'date' => DateTimeHelper::toDateTime($latestStart)->format('Y-m-d'),
                 'amount' => $invoiceData['total'] / 100,
                 'url' => $invoiceData['invoice_pdf'],
+                //'id' => $invoiceData['id'],
             ];
         }
 
         return $this->asJson($data);
+    }
+
+    /**
+     * Downloads a subscription invoice from Stripe.
+     *
+     * @return Response
+     * @throws \yii\web\BadRequestHttpException
+     */
+    public function actionDownloadSubscriptionInvoice(): Response
+    {
+        $id = $this->request->getRequiredParam('id');
+
+        try {
+            $headers = [
+                'Authorization' => 'Bearer ' . App::env('STRIPE_API_KEY'),
+                'Accept'        => 'application/json',
+            ];
+
+            $client = Craft::createGuzzleClient();
+
+            $response = $client->get('https://api.stripe.com/v1/invoices/'.$id, $headers);
+
+            if ($response->getStatusCode() !== 200) {
+                throw new \Exception('Could not connect to dev server.');
+            }
+
+            if (!$body = $response->getBody()) {
+                throw new \Exception('Response has no body.');
+            }
+
+            $contents = $body->getContents();
+            $json = json_decode($contents, true);
+
+            $invoiceUrl = $json->invoice_pdf;
+
+            if (!$invoiceUrl) {
+                throw new \Exception('Could not find an invoice.');
+            }
+
+            return $this->redirect($invoiceUrl);
+        } catch (Throwable $e) {
+            return $this->asErrorJson($e->getMessage());
+        }
     }
 }
