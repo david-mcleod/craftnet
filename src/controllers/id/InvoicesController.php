@@ -8,6 +8,7 @@ use craft\commerce\stripe\Plugin as StripePlugin;
 use craft\helpers\App;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Json;
+use craft\helpers\UrlHelper;
 use craft\web\Controller;
 use craftnet\Module;
 use Throwable;
@@ -118,8 +119,7 @@ class InvoicesController extends Controller
             $data['invoices'][] = [
                 'date' => DateTimeHelper::toDateTime($latestStart)->format('Y-m-d'),
                 'amount' => $invoiceData['total'] / 100,
-                'url' => $invoiceData['invoice_pdf'],
-                //'id' => $invoiceData['id'],
+                'url' => UrlHelper::actionUrl('craftnet/id/invoices/download-subscription-invoice', ['id' => $invoiceData['id']]),
             ];
         }
 
