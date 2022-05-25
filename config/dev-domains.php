@@ -153,6 +153,7 @@ return [
     'vrielingdev.nl',
     'wave-dev.com',
     'wave-stage.com',
+    'weareboq.design',
     'webdnatest.co.uk',
     'websitetestlink.com',
     'website-stage.com',
