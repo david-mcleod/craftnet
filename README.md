@@ -8,3 +8,28 @@ It is not meant to be self-installable. We’ve published it to a public repo fo
 
 - [Craft ID Resources](web/craftnetresources/id/README.md)
 - [Craft Plugin Store Resources](web/craftnetresources/plugins/README.md)
+
+### Local Development with DDEV
+
+#### Prerequisites
+
+- [Install DDEV](https://ddev.readthedocs.io/en/stable/)
+
+#### Setup
+
+```sh
+cp .env.example .env
+ddev start
+ddev exec composer install
+ddev exec php craft setup/security-key
+```
+
+#### Examples
+
+```sh
+# View URLs and other relevant info
+ddev describe
+
+# Run craft CLI commands
+ddev exec php craft
+```
