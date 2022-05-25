@@ -3,7 +3,6 @@
 /.idea
 /.env
 /node_modules/
-/.ddev
 
 # Elastic Beanstalk Files
 .elasticbeanstalk
