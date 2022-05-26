@@ -21,7 +21,7 @@ return [
         'cpTrigger' => App::env('CRAFT_CP_TRIGGER'),
         'imageDriver' => 'gd',
         'preventUserEnumeration' => true,
-        'securityKey' => App::env('SECURITY_KEY'),
+        'securityKey' => App::env('CRAFT_SECURITY_KEY'),
         'csrfTokenName' => 'CRAFTNET_CSRF_TOKEN',
         'phpSessionName' => 'CraftnetSessionId',
         'generateTransformsBeforePageLoad' => true,
