@@ -202,6 +202,9 @@ OUTPUT;
                     ];
                 }
 
+                Db::delete('craftnet_plugin_issue_stats', [
+                    'pluginId' => $plugin->id,
+                ]);
                 Db::batchInsert('craftnet_plugin_issue_stats', [
                     'pluginId',
                     'period',
