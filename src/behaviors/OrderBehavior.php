@@ -6,6 +6,7 @@ use Craft;
 use craft\commerce\elements\Order;
 use craft\commerce\records\Transaction as TransactionRecord;
 use craft\elements\User;
+use craft\helpers\App;
 use craft\helpers\StringHelper;
 use craftnet\cms\CmsLicense;
 use craftnet\Module;
@@ -13,6 +14,7 @@ use craftnet\orders\PdfRenderer;
 use craftnet\plugins\PluginLicense;
 use craftnet\plugins\PluginPurchasable;
 use Stripe\PaymentIntent;
+use Stripe\Stripe;
 use yii\base\Behavior;
 
 /**
@@ -113,6 +115,7 @@ class OrderBehavior extends Behavior
 
         // In case we're dealing with a payment intent here, grab the latest charge
         if (StringHelper::startsWith($chargeId, 'pi_')) {
+            Stripe::setApiKey(App::env('STRIPE_API_KEY'));
             $stripePaymentIntent = PaymentIntent::retrieve($chargeId);
             $chargeId = $stripePaymentIntent->charges->data[0]->id;
         }
