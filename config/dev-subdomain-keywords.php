@@ -5,6 +5,7 @@ return [
     'acceptance',
     'acceptatie',
     'craftdemo',
+    'ci',
     'dev',
     'integration',
     'loc',
