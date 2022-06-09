@@ -104,6 +104,7 @@ return [
         'new.atom' => 'craftnet/feeds/feeds/new',
         'releases.atom' => 'craftnet/feeds/feeds/releases',
         'critical.atom' => 'craftnet/feeds/feeds/critical',
+        'cms.atom' => 'craftnet/feeds/feeds/cms',
         '<handle:[\w\-]+>.atom' => 'craftnet/feeds/feeds/plugin',
     ]
 ];
