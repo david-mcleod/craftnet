@@ -37,6 +37,7 @@ return [
     'digitalliondev.com',
     'digitalpulse.dev',
     'dmdr.io',
+    'docksal.site',
     'dotmeta.com',
     'drivedev.net',
     'dw.gg',
